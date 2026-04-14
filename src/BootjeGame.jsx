@@ -17,10 +17,10 @@ const SCREENS = [
 ];
 
 const BOOTJE_POINTS = [
-  { id: 1, xPct: 75, yPct: 30, label: 'Aanzuig compressor', color: '#2563EB' },
-  { id: 2, xPct: 82, yPct: 75, label: 'Uit compressor', color: '#DC2626' },
-  { id: 3, xPct: 25, yPct: 75, label: 'Uit condensor', color: '#7C3AED' },
-  { id: 4, xPct: 25, yPct: 30, label: 'Na expansie', color: '#059669' },
+  { id: 1, xPct: 80, yPct: 30, label: 'Aanzuig compressor', color: '#2563EB' },
+  { id: 2, xPct: 92, yPct: 75, label: 'Uit compressor', color: '#DC2626' },
+  { id: 3, xPct: 18, yPct: 75, label: 'Uit condensor', color: '#7C3AED' },
+  { id: 4, xPct: 18, yPct: 30, label: 'Na expansie', color: '#059669' },
 ];
 
 const BOOTJE_LINES = [
@@ -46,11 +46,39 @@ const M1R2_CARDS = [
   { id: 'f', text: 'Druk in de vrije buitenlucht', correct: 'absoluut' },
 ];
 
-const M1R3_TASKS = [
-  { context: 'Lagedruk manometer koelinstallatie', effective: 2, absolute: 3 },
-  { context: 'Hogedruk manometer koelinstallatie', effective: 14, absolute: 15 },
-  { context: 'Lekke installatie (onderdruk)', effective: -0.3, absolute: 0.7 },
-];
+// Variant pools — each round we pick one random variant per category
+const M1R3_VARIANTS = {
+  lagedruk: [
+    { effective: 1.5, absolute: 2.5 },
+    { effective: 2, absolute: 3 },
+    { effective: 2.5, absolute: 3.5 },
+    { effective: 3, absolute: 4 },
+    { effective: 3.5, absolute: 4.5 },
+  ],
+  hogedruk: [
+    { effective: 11, absolute: 12 },
+    { effective: 13, absolute: 14 },
+    { effective: 14, absolute: 15 },
+    { effective: 16, absolute: 17 },
+    { effective: 18, absolute: 19 },
+  ],
+  onderdruk: [
+    { effective: -0.2, absolute: 0.8 },
+    { effective: -0.3, absolute: 0.7 },
+    { effective: -0.4, absolute: 0.6 },
+    { effective: -0.5, absolute: 0.5 },
+    { effective: -0.6, absolute: 0.4 },
+  ],
+};
+
+function pickM1R3Tasks() {
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  return [
+    { context: 'Lagedruk manometer koelinstallatie', ...pick(M1R3_VARIANTS.lagedruk) },
+    { context: 'Hogedruk manometer koelinstallatie', ...pick(M1R3_VARIANTS.hogedruk) },
+    { context: 'Lekke installatie (onderdruk)', ...pick(M1R3_VARIANTS.onderdruk) },
+  ];
+}
 
 const M2R3_PHASES = [
   {
@@ -86,6 +114,9 @@ const M2R3_PHASES = [
 // Points where bootje crosses saturation lines
 // 1' = where evaporator line crosses vapor line (superheat starts)
 // 3' = where condenser line crosses liquid line (subcooling starts)
+// Positions on the saturation lines (where the bootje crosses them in the diagram)
+// 1' on vapor line at yPct=30 (p≈2 bar) → h≈378 → xPct≈69.5
+// 3' on liquid line at yPct=75 (p≈15.8 bar) → h≈217 → xPct≈29.5
 const SUPERHEAT_POINT = { id: "1'", xPct: 69.5, yPct: 30, label: 'Oververhitting', color: '#F97316' };
 const SUBCOOL_POINT = { id: "3'", xPct: 29.5, yPct: 75, label: 'Nakoeling', color: '#3B82F6' };
 
@@ -109,7 +140,7 @@ const OVH_NAK_PHASES = [
       const subT = (t - 0.85) / 0.15;
       return { temp: 43 - subT * (43 - 38), pressure: p, region: 'liquid', bubbleIntensity: 0, label: 'Nakoeling (onderkoeling)' };
     },
-    explanation: 'Na de vloeistoflijn is het koudemiddel 100% vloeistof. De extra afkoeling heet nakoeling. Dit voorkomt flashgas in het expansieventiel.',
+    explanation: 'Na de vloeistoflijn is het koudemiddel 100% vloeistof. De extra afkoeling heet nakoeling. Dit voorkomt flashgas in de vloeistofleiding voor het expansieventiel.',
   },
   { // Evaporation: 4→1'→1 (coexistence → vapor → superheated)
     title: 'Verdamping & oververhitting',
@@ -247,9 +278,9 @@ const ITEMBANKS = {
       feedbackCorrect: 'Klopt! Na de vloeistoflijn daalt de temperatuur nog iets. Dat is nakoeling.',
       feedbackWrong: 'Na de vloeistoflijn is het koudemiddel 100% vloeistof. Wat gebeurt er dan met de temperatuur?' },
     { question: 'Wat is het risico als er te weinig nakoeling is?',
-      options: ['De compressor gaat kapot', 'Er komt flashgas in het expansieventiel', 'De verdamper bevriest'],
+      options: ['De compressor gaat kapot', 'Er komt flashgas in de vloeistofleiding voor het expansieventiel', 'De verdamper bevriest'],
       correct: 1,
-      feedbackCorrect: 'Precies! Zonder voldoende nakoeling kan er damp (flashgas) in het expansieventiel komen, wat de capaciteit verlaagt.',
+      feedbackCorrect: 'Precies! Zonder voldoende nakoeling kan er damp (flashgas) ontstaan in de vloeistofleiding voor het expansieventiel, wat de capaciteit verlaagt.',
       feedbackWrong: 'Nakoeling gaat over het stuk vloeistof vóór het expansieventiel. Wat kan er misgaan als het niet 100% vloeistof is?' },
   ],
 };
@@ -366,6 +397,21 @@ function pickRandomQuestion(itembank) {
     feedbackCorrect: q.feedbackCorrect,
     feedbackWrong: q.feedbackWrong,
   };
+}
+
+// Prepare all questions from an itembank with shuffled options
+function prepareAllQuestions(itembank) {
+  return itembank.map(q => {
+    const items = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.correct }));
+    const shuffled = shuffleArray(items);
+    return {
+      question: q.question,
+      options: shuffled.map(x => x.text),
+      correct: shuffled.findIndex(x => x.isCorrect),
+      feedbackCorrect: q.feedbackCorrect,
+      feedbackWrong: q.feedbackWrong,
+    };
+  });
 }
 
 function getMissionAndRound(screen) {
@@ -599,24 +645,31 @@ function PressureGauge({ value, max = 4, size = 140, label = 'bar' }) {
 // QUIZ CHECK COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
-function QuizCheck({ quizQ, maxPoints, onComplete, onLoseLife, lives }) {
+function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
+  // quizQs is an array of questions; we step through them one by one
+  const [qIdx, setQIdx] = useState(0);
   const [selected, setSelected] = useState(null);
   const [checked, setChecked] = useState(false);
-  const [attempts, setAttempts] = useState(0);
-  const [done, setDone] = useState(false);
-  const [earnedPoints, setEarnedPoints] = useState(0);
+  const [attemptsThisQ, setAttemptsThisQ] = useState(0);
+  const [questionDone, setQuestionDone] = useState(false); // current question answered correctly
+  const [allDone, setAllDone] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(0);
+
+  const quizQ = quizQs[qIdx];
+  const isLast = qIdx === quizQs.length - 1;
+  const perQuestionMax = { first: Math.ceil(maxPoints.first / quizQs.length), second: Math.ceil(maxPoints.second / quizQs.length) };
 
   const handleCheck = () => {
     if (selected === null || lives <= 0) return;
     const isCorrect = selected === quizQ.correct;
-    const newAttempts = attempts + 1;
-    setAttempts(newAttempts);
+    const newAttempts = attemptsThisQ + 1;
+    setAttemptsThisQ(newAttempts);
     setChecked(true);
 
     if (isCorrect) {
-      const pts = newAttempts === 1 ? maxPoints.first : maxPoints.second;
-      setEarnedPoints(pts);
-      setDone(true);
+      const pts = newAttempts === 1 ? perQuestionMax.first : perQuestionMax.second;
+      setTotalPoints(p => p + pts);
+      setQuestionDone(true);
     } else {
       onLoseLife?.();
     }
@@ -627,12 +680,25 @@ function QuizCheck({ quizQ, maxPoints, onComplete, onLoseLife, lives }) {
     setChecked(false);
   };
 
+  const handleNext = () => {
+    if (isLast) {
+      setAllDone(true);
+    } else {
+      setQIdx(i => i + 1);
+      setSelected(null);
+      setChecked(false);
+      setAttemptsThisQ(0);
+      setQuestionDone(false);
+    }
+  };
+
   const isCorrect = checked && selected === quizQ.correct;
   const isWrong = checked && !isCorrect;
 
   return (
     <div className="max-w-lg mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
       <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+        <p className="text-xs font-bold mb-2" style={{ color: '#5C3A21' }}>Vraag {qIdx + 1} van {quizQs.length}</p>
         <h3 className="text-lg font-bold italic mb-4" style={{ color: '#2C1810' }}>{quizQ.question}</h3>
         <div className="space-y-2 mb-4">
           {quizQ.options.map((opt, i) => {
@@ -642,7 +708,7 @@ function QuizCheck({ quizQ, maxPoints, onComplete, onLoseLife, lives }) {
             if (checked && isCorrect && i === quizQ.correct) { optStyle = { border: '2px solid #6B8E3D', background: 'rgba(107,142,61,0.1)' }; }
             if (checked && selected === i && i !== quizQ.correct) { optStyle = { border: '2px solid #B84A3D', background: 'rgba(184,74,61,0.1)' }; }
             return (
-              <button key={i} disabled={done || checked} onClick={() => setSelected(i)}
+              <button key={i} disabled={questionDone || checked} onClick={() => setSelected(i)}
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all ${extra}`} style={optStyle}>
                 <span style={{ color: '#2C1810' }}>{opt}</span>
                 {checked && isCorrect && i === quizQ.correct && <Check className="inline ml-2" size={16} style={{ color: '#6B8E3D' }} />}
@@ -658,7 +724,7 @@ function QuizCheck({ quizQ, maxPoints, onComplete, onLoseLife, lives }) {
           </div>
         )}
 
-        {!checked && !done && (
+        {!checked && !questionDone && (
           <button onClick={handleCheck} disabled={selected === null}
             className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
@@ -672,15 +738,22 @@ function QuizCheck({ quizQ, maxPoints, onComplete, onLoseLife, lives }) {
             Probeer opnieuw
           </button>
         )}
-        {done && (
-          <button onClick={() => onComplete(earnedPoints)}
+        {questionDone && !allDone && (
+          <button onClick={handleNext}
+            className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
+            style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+            {isLast ? 'Afronden' : 'Volgende vraag'} <ChevronRight size={18} />
+          </button>
+        )}
+        {allDone && (
+          <button onClick={() => onComplete(totalPoints)}
             className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
             style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
             Verder <ChevronRight size={18} />
           </button>
         )}
-        {done && earnedPoints > 0 && (
-          <p className="text-center text-sm mt-2 font-bold" style={{ color: '#FBBF24' }}>+{earnedPoints} punten</p>
+        {allDone && totalPoints > 0 && (
+          <p className="text-center text-sm mt-2 font-bold" style={{ color: '#FBBF24' }}>+{totalPoints} punten</p>
         )}
       </div>
     </div>
@@ -847,8 +920,8 @@ function M1IntroScreen({ onBegin }) {
           <h2 className="text-xl font-extrabold" style={{ color: '#2C1810' }}>Missie 1 — Druk begrijpen</h2>
         </div>
         <div className="italic leading-relaxed mb-6" style={{ color: '#5C3A21', lineHeight: 1.7 }}>
-          <p className="font-extrabold text-lg mb-2" style={{ color: '#2C1810' }}>Een manometer liegt!</p>
-          <p className="mb-2">Niet echt, maar hij laat nooit de volledige waarheid zien.</p>
+          <p className="font-extrabold text-lg mb-2" style={{ color: '#2C1810' }}>De manometer aflezen.</p>
+          <p className="mb-2">Een manometer geeft de druk aan in een systeem. Maar daarnaast heb je ook nog de atmosferische druk.</p>
           <p>In deze missie leer je het verschil tussen <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>absolute druk</span> en <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>effectieve druk</span>.</p>
         </div>
         <button onClick={onBegin}
@@ -1311,7 +1384,7 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
           {allPlaced && (
             <div className="mt-4">
               <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#6B8E3D' }}>
-                Mooi! Je herkent nu het verschil. Alles wat je op een manometer afleest is effectief. Alles wat als "referentie" dient (atmosferisch, vacuüm) is absoluut.
+                Mooi! Je herkent nu het verschil. Alles wat je op een manometer afleest is effectief. Alles wat als referentie dient (atmosferisch, vacuüm) is absoluut.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
@@ -1343,9 +1416,10 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
 // ═══════════════════════════════════════════════════════════════
 
 function ConversionPanel({ onComplete, onLoseLife, lives }) {
-  const [answers, setAnswers] = useState(M1R3_TASKS.map(() => ''));
-  const [results, setResults] = useState(M1R3_TASKS.map(() => null)); // null | 'correct' | 'wrong'
-  const [attempts, setAttempts] = useState(M1R3_TASKS.map(() => 0));
+  const [tasks] = useState(() => pickM1R3Tasks());
+  const [answers, setAnswers] = useState(tasks.map(() => ''));
+  const [results, setResults] = useState(tasks.map(() => null)); // null | 'correct' | 'wrong'
+  const [attempts, setAttempts] = useState(tasks.map(() => 0));
   const [showHint3, setShowHint3] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
   const allDone = results.every(r => r === 'correct' || (r === 'wrong'));
@@ -1355,7 +1429,7 @@ function ConversionPanel({ onComplete, onLoseLife, lives }) {
     const newAttempts = [...attempts];
     let pts = 0;
 
-    M1R3_TASKS.forEach((task, i) => {
+    tasks.forEach((task, i) => {
       if (results[i] === 'correct') return;
       const val = parseFloat(answers[i].replace(',', '.'));
       if (isNaN(val)) {
@@ -1403,7 +1477,7 @@ function ConversionPanel({ onComplete, onLoseLife, lives }) {
           <p className="text-sm italic mb-4" style={{ color: '#5C3A21' }}>Je bent bij een koelinstallatie. Lees elke manometer af en vul de <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>absolute druk</span> in.</p>
 
           <div className="space-y-4 mb-4">
-            {M1R3_TASKS.map((task, i) => (
+            {tasks.map((task, i) => (
               <div key={i} className="p-4 rounded-lg" style={{
                 border: results[i] === 'correct' ? '2px solid #6B8E3D' : results[i] === 'wrong' ? '2px solid #B84A3D' : '2px solid #e8e0c8',
                 background: results[i] === 'correct' ? 'rgba(107,142,61,0.1)' : results[i] === 'wrong' ? 'rgba(184,74,61,0.1)' : '#FAFAF5'
@@ -2424,7 +2498,7 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
           {step === 4 && (
             <div className="mt-4">
               <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#6B8E3D' }}>
-                Goed gedaan! Je kent nu oververhitting en nakoeling. Oververhitting beschermt de compressor tegen vloeistofslag. Nakoeling voorkomt flashgas in het expansieventiel.
+                Goed gedaan! Je kent nu oververhitting en nakoeling. Oververhitting beschermt de compressor tegen vloeistofslag. Nakoeling voorkomt flashgas in de vloeistofleiding voor het expansieventiel.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
@@ -2540,10 +2614,16 @@ export default function BootjeGame() {
     return () => window.removeEventListener('keydown', handler);
   }, [debugVisible]);
 
-  // Select quiz question when entering a _check screen
+  // Prepare quiz questions when entering a _check screen
+  // Mission 1: 1 random question. Mission 2: all 3 questions sequentially.
   useEffect(() => {
     if (screen.endsWith('_check') && ITEMBANKS[screen]) {
-      setQuizQuestion(pickRandomQuestion(ITEMBANKS[screen]));
+      const isMission2 = screen.startsWith('m2');
+      if (isMission2) {
+        setQuizQuestion(prepareAllQuestions(ITEMBANKS[screen]));
+      } else {
+        setQuizQuestion([pickRandomQuestion(ITEMBANKS[screen])]);
+      }
     }
   }, [screen]);
 
@@ -2596,7 +2676,7 @@ export default function BootjeGame() {
       case 'm1r1_check':
         return quizQuestion ? (
           <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
-            <QuizCheck quizQ={quizQuestion} maxPoints={SCORING.m1r1_check} onComplete={handleQuizComplete('m1r2')} onLoseLife={loseLife} lives={lives} />
+            <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m1r1_check} onComplete={handleQuizComplete('m1r2')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
       case 'm1r2':
@@ -2604,7 +2684,7 @@ export default function BootjeGame() {
       case 'm1r2_check':
         return quizQuestion ? (
           <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
-            <QuizCheck quizQ={quizQuestion} maxPoints={SCORING.m1r2_check} onComplete={handleQuizComplete('m1r3')} onLoseLife={loseLife} lives={lives} />
+            <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m1r2_check} onComplete={handleQuizComplete('m1r3')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
       case 'm1r3':
@@ -2612,7 +2692,7 @@ export default function BootjeGame() {
       case 'm1r3_check':
         return quizQuestion ? (
           <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
-            <QuizCheck quizQ={quizQuestion} maxPoints={SCORING.m1r3_check} onComplete={handleQuizComplete('m2_intro')} onLoseLife={loseLife} lives={lives} />
+            <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m1r3_check} onComplete={handleQuizComplete('m2_intro')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
       case 'm2_intro':
@@ -2622,7 +2702,7 @@ export default function BootjeGame() {
       case 'm2r1_check':
         return quizQuestion ? (
           <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
-            <QuizCheck quizQ={quizQuestion} maxPoints={SCORING.m2r1_check} onComplete={handleQuizComplete('m2r3')} onLoseLife={loseLife} lives={lives} />
+            <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m2r1_check} onComplete={handleQuizComplete('m2r3')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
       case 'm2r3':
@@ -2630,7 +2710,7 @@ export default function BootjeGame() {
       case 'm2r3_check':
         return quizQuestion ? (
           <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
-            <QuizCheck quizQ={quizQuestion} maxPoints={SCORING.m2r3_check} onComplete={handleQuizComplete('m2r4')} onLoseLife={loseLife} lives={lives} />
+            <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m2r3_check} onComplete={handleQuizComplete('m2r4')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
       case 'm2r4':
@@ -2638,7 +2718,7 @@ export default function BootjeGame() {
       case 'm2r4_check':
         return quizQuestion ? (
           <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
-            <QuizCheck quizQ={quizQuestion} maxPoints={SCORING.m2r4_check} onComplete={handleQuizComplete('end')} onLoseLife={loseLife} lives={lives} />
+            <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m2r4_check} onComplete={handleQuizComplete('end')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
       case 'end':
