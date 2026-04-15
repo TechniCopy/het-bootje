@@ -652,7 +652,6 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
   const [checked, setChecked] = useState(false);
   const [attemptsThisQ, setAttemptsThisQ] = useState(0);
   const [questionDone, setQuestionDone] = useState(false); // current question answered correctly
-  const [allDone, setAllDone] = useState(false);
   const [totalPoints, setTotalPoints] = useState(0);
 
   const quizQ = quizQs[qIdx];
@@ -682,7 +681,8 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
 
   const handleNext = () => {
     if (isLast) {
-      setAllDone(true);
+      // Final question correct → immediately finish and pass points to parent
+      onComplete(totalPoints);
     } else {
       setQIdx(i => i + 1);
       setSelected(null);
@@ -698,7 +698,9 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
   return (
     <div className="max-w-lg mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
       <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-        <p className="text-xs font-bold mb-2" style={{ color: '#5C3A21' }}>Vraag {qIdx + 1} van {quizQs.length}</p>
+        {quizQs.length > 1 && (
+          <p className="text-xs font-bold mb-2" style={{ color: '#5C3A21' }}>Vraag {qIdx + 1} van {quizQs.length}</p>
+        )}
         <h3 className="text-lg font-bold italic mb-4" style={{ color: '#2C1810' }}>{quizQ.question}</h3>
         <div className="space-y-2 mb-4">
           {quizQ.options.map((opt, i) => {
@@ -738,22 +740,12 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
             Probeer opnieuw
           </button>
         )}
-        {questionDone && !allDone && (
+        {questionDone && (
           <button onClick={handleNext}
             className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
             style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
             {isLast ? 'Afronden' : 'Volgende vraag'} <ChevronRight size={18} />
           </button>
-        )}
-        {allDone && (
-          <button onClick={() => onComplete(totalPoints)}
-            className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-            style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
-            Verder <ChevronRight size={18} />
-          </button>
-        )}
-        {allDone && totalPoints > 0 && (
-          <p className="text-center text-sm mt-2 font-bold" style={{ color: '#FBBF24' }}>+{totalPoints} punten</p>
         )}
       </div>
     </div>
@@ -2621,11 +2613,11 @@ export default function BootjeGame() {
   }, [debugVisible]);
 
   // Prepare quiz questions when entering a _check screen
-  // Mission 1: 1 random question. Mission 2: all 3 questions sequentially.
+  // Mission 1 + m2r1: 1 random question. m2r3/m2r4: all 3 questions sequentially.
   useEffect(() => {
     if (screen.endsWith('_check') && ITEMBANKS[screen]) {
-      const isMission2 = screen.startsWith('m2');
-      if (isMission2) {
+      const multiQuestionScreens = ['m2r3_check', 'm2r4_check'];
+      if (multiQuestionScreens.includes(screen)) {
         setQuizQuestion(prepareAllQuestions(ITEMBANKS[screen]));
       } else {
         setQuizQuestion([pickRandomQuestion(ITEMBANKS[screen])]);
