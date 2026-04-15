@@ -2325,11 +2325,13 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
   const [feedback, setFeedback] = useState(null);
   const [points, setPoints] = useState(0);
   const [placedPrimes, setPlacedPrimes] = useState([]); // which prime points are placed
+  const [readyPhase, setReadyPhase] = useState(null); // 0 or 1: show "Goed!" message before animation
   const animRef = useRef(null);
   const svgRef = useRef(null);
 
   const currentPhase = step === 1 ? 0 : step === 3 ? 1 : null; // which OVH_NAK_PHASES
   const isAnimating = step === 1 || step === 3;
+  const showReady = readyPhase !== null;
 
   const getSvgCoords = (clientX, clientY) => {
     const svg = svgRef.current?.querySelector('svg') || svgRef.current;
@@ -2342,7 +2344,7 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
   };
 
   const handleDiagramClick = (e) => {
-    if (isAnimating || step === 4) return;
+    if (isAnimating || step === 4 || showReady) return;
 
     const coords = getSvgCoords(e.clientX, e.clientY);
     if (!coords) return;
@@ -2354,7 +2356,7 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
         setPlacedPrimes(prev => [...prev, "3'"]);
         setPoints(p => p + SCORING.m2r4_point);
         setFeedback(null);
-        startAnimation(0);
+        setReadyPhase(0); // show "Goed!" message before animation
       } else {
         setFeedback('Klik op de plek waar de condensorlijn (2→3) de vloeistoflijn kruist.');
         onLoseLife?.();
@@ -2367,13 +2369,19 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
         setPlacedPrimes(prev => [...prev, "1'"]);
         setPoints(p => p + SCORING.m2r4_point);
         setFeedback(null);
-        startAnimation(1);
+        setReadyPhase(1);
       } else {
         setFeedback('Klik op de plek waar de verdamperlijn (4→1) de damplijn kruist.');
         onLoseLife?.();
         setTimeout(() => setFeedback(null), 2500);
       }
     }
+  };
+
+  const handleStartAnimation = () => {
+    const phase = readyPhase;
+    setReadyPhase(null);
+    startAnimation(phase);
   };
 
   const startAnimation = (phaseIdx) => {
@@ -2427,10 +2435,25 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>Oververhitting & nakoeling</h3>
 
           {/* Instruction */}
-          {currentText && (
+          {currentText && !showReady && (
             <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid #FBBF24', color: '#2C1810', animation: 'fadeInUp 0.3s' }}>
               <p className="font-bold mb-1">{currentText.title}</p>
               <p>{currentText.desc}</p>
+            </div>
+          )}
+
+          {/* "Goed!" ready message before animation */}
+          {showReady && (
+            <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(107,142,61,0.12)', border: '1px solid #6B8E3D', color: '#2C1810', animation: 'fadeInUp 0.3s' }}>
+              <p className="mb-2">
+                <span className="font-extrabold">Goed!</span> Gebied {readyPhase === 0 ? "3' en 3" : "1' – 1"} = de {readyPhase === 0 ? 'nakoeling' : 'oververhitting'}.
+              </p>
+              <p className="mb-3">Let goed op wat er met de <strong>temperatuur</strong> en <strong>fase</strong> gebeurt{readyPhase === 0 ? '!' : '.'}</p>
+              <button onClick={handleStartAnimation}
+                className="w-full py-2 text-white rounded-lg font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
+                style={{ background: '#6B8E3D', border: '2px solid #2C1810', boxShadow: '0 3px 0 #4a6b2a' }}>
+                Start animatie <ChevronRight size={18} />
+              </button>
             </div>
           )}
 
