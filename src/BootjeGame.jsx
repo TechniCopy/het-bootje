@@ -1632,9 +1632,15 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
       setFeedback(null);
     } else {
       setFlashLine(line.component);
-      setFeedback({ type: 'incorrect', text: 'Dat is niet de juiste lijn. Probeer opnieuw!' });
+      const hints = {
+        compressor: 'De compressor werkt alleen met volledig verdampt koudemiddel.',
+        condensor: 'In de condensor verandert het koudemiddel van gasvormig naar vloeibaar.',
+        expansieventiel: 'In het expansieventiel zakt de druk van het koudemiddel.',
+        verdamper: 'In de verdamper verandert het koudemiddel van vloeibaar naar gasvormig.',
+      };
+      setFeedback({ type: 'incorrect', text: hints[compId] || 'Dat is niet de juiste lijn. Probeer opnieuw!' });
       onLoseLife?.();
-      setTimeout(() => { setFlashLine(null); setFeedback(null); }, 1200);
+      setTimeout(() => { setFlashLine(null); setFeedback(null); }, 3500);
       setSelectedComp(null);
     }
   };
