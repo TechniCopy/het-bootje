@@ -82,28 +82,28 @@ function pickM1R3Tasks() {
 
 const M2R3_PHASES = [
   {
-    description: 'Het koudemiddel is volledig gasvormig en wordt gecomprimeerd naar een gas van hoge druk en hoge temperatuur. Verbind de punten waar dit gebeurt.',
+    description: <>Het koudemiddel is <span className="font-bold">volledig gasvormig</span> en wordt <span className="font-bold">gecomprimeerd</span> naar een gas van hoge druk en hoge temperatuur. Verbind de punten waar dit gebeurt.</>,
     correctFrom: 1, correctTo: 2,
     componentName: 'Compressor',
     tooltip: 'De compressor comprimeert het gas. Druk en temperatuur stijgen sterk.',
     color: '#2563EB',
   },
   {
-    description: 'Het oververhitte gas koelt af en condenseert tot vloeistof. De druk blijft hetzelfde, maar het koudemiddel verliest veel warmte aan de omgeving. Verbind de punten waar dit gebeurt.',
+    description: <>Het oververhitte gas koelt af en <span className="font-bold">condenseert tot vloeistof</span>. De <span className="font-bold">druk blijft hetzelfde</span>, maar het koudemiddel verliest veel warmte aan de omgeving. Verbind de punten waar dit gebeurt.</>,
     correctFrom: 2, correctTo: 3,
     componentName: 'Condensor',
     tooltip: 'Het hete gas koelt af en condenseert tot vloeistof. De druk blijft gelijk.',
     color: '#DC2626',
   },
   {
-    description: 'De vloeistof stroomt door een vernauwing. De druk stort in en de vloeistof wordt deels damp. De warmte-inhoud blijft gelijk tijdens dit proces. Verbind de punten waar dit gebeurt.',
+    description: <>De vloeistof stroomt door een <span className="font-bold">vernauwing</span>. De <span className="font-bold">druk stort in</span> en de vloeistof wordt <span className="font-bold">deels damp</span>. De warmte-inhoud blijft gelijk tijdens dit proces. Verbind de punten waar dit gebeurt.</>,
     correctFrom: 3, correctTo: 4,
     componentName: 'Expansieventiel',
     tooltip: 'Druk daalt plotseling. Het koudemiddel wordt een mix van vloeistof en damp.',
     color: '#7C3AED',
   },
   {
-    description: 'De mix van vloeistof en damp verdampt volledig en neemt daarbij warmte op uit de omgeving. De druk blijft gelijk. Verbind de punten waar dit gebeurt.',
+    description: <>De mix van vloeistof en damp <span className="font-bold">verdampt volledig</span> en neemt daarbij <span className="font-bold">warmte op</span> uit de omgeving. De druk blijft gelijk. Verbind de punten waar dit gebeurt.</>,
     correctFrom: 4, correctTo: 1,
     componentName: 'Verdamper',
     tooltip: 'Het koudemiddel verdampt en neemt warmte op uit de omgeving.',
@@ -124,7 +124,7 @@ const SUBCOOL_POINT = { id: "3'", xPct: 29.5, yPct: 75, label: 'Nakoeling', colo
 const OVH_NAK_PHASES = [
   { // Condensation: 2→3'→3 (vapor → coexistence → liquid → subcooled)
     title: 'Condensatie & nakoeling',
-    description: 'Bekijk wat er gebeurt als het koudemiddel van punt 2 naar punt 3 stroomt. Let op wat er bij de vloeistoflijn gebeurt.',
+    description: <>Bekijk wat er gebeurt als het koudemiddel van punt 2 naar punt 3 stroomt. Let op wat er bij de <span className="font-bold">vloeistoflijn</span> gebeurt.</>,
     from: BOOTJE_POINTS[1], // point 2
     to: BOOTJE_POINTS[2],   // point 3
     primePoint: SUBCOOL_POINT,
@@ -144,7 +144,7 @@ const OVH_NAK_PHASES = [
   },
   { // Evaporation: 4→1'→1 (coexistence → vapor → superheated)
     title: 'Verdamping & oververhitting',
-    description: 'Bekijk wat er gebeurt als het koudemiddel van punt 4 naar punt 1 stroomt. Let op wat er bij de damplijn gebeurt.',
+    description: <>Bekijk wat er gebeurt als het koudemiddel van punt 4 naar punt 1 stroomt. Let op wat er bij de <span className="font-bold">damplijn</span> gebeurt.</>,
     from: BOOTJE_POINTS[3], // point 4
     to: BOOTJE_POINTS[0],   // point 1
     primePoint: SUPERHEAT_POINT,
@@ -887,7 +887,7 @@ function StartScreen({ onStart }) {
         <h2 className="text-xl font-bold italic mb-4" style={{ color: '#5b7280' }}>Druk & het h-log p diagram</h2>
         <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <p className="italic leading-relaxed" style={{ color: '#5b7280', lineHeight: 1.7 }}>
-            Leer alles over druk en het h-log p diagram. Ontdek het verschil tussen absolute en effectieve druk, en bouw het beroemde bootje op in het diagram!
+            Leer alles over druk en het <span className="font-bold">h-log p diagram</span>. Ontdek het verschil tussen <span className="font-bold">absolute</span> en <span className="font-bold">effectieve druk</span>, en bouw het beroemde <span className="font-bold">bootje</span> op in het diagram!
           </p>
         </div>
         <button onClick={onStart}
@@ -914,7 +914,7 @@ function M1IntroScreen({ onBegin }) {
         </div>
         <div className="italic leading-relaxed mb-6" style={{ color: '#5b7280', lineHeight: 1.7 }}>
           <p className="font-extrabold text-lg mb-2" style={{ color: '#0D4868' }}>De manometer aflezen.</p>
-          <p className="mb-2">Een manometer geeft de druk aan in een systeem. Maar daarnaast heb je ook nog de atmosferische druk.</p>
+          <p className="mb-2">Een <span className="font-bold">manometer</span> geeft de druk aan in een systeem. Maar daarnaast heb je ook nog de <span className="font-bold">atmosferische druk</span>.</p>
           <p>In deze missie leer je het verschil tussen <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> en <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>effectieve druk</span>.</p>
         </div>
         <button onClick={onBegin}
@@ -968,7 +968,7 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
       <div className="max-w-2xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
         <div className="bg-white rounded-2xl p-6 mb-4" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>De fietsband</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Pomp de fietsband op tot <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>2,5 bar</span> (effectieve druk) door de slider te schuiven.</p>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Pomp de fietsband op tot <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>2,5 bar</span> (<span className="font-bold">effectieve druk</span>) door de slider te schuiven.</p>
 
           <div className="flex items-start gap-3 mb-4">
             {/* Bike + Gauge column */}
@@ -1339,7 +1339,7 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
         <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Sorteerspel</h3>
           <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Sorteer de kaartjes. Gaat het over <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> of over wat je op een <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>manometer</span> afleest?</p>
-          <p className="text-xs mb-4" style={{ color: '#5b7280' }}>Sleep een kaartje naar de juiste bak, of klik en dan de bak.</p>
+          <p className="text-xs mb-4" style={{ color: '#5b7280' }}><span className="font-bold">Sleep</span> een kaartje naar de juiste bak, of <span className="font-bold">klik</span> en dan de bak.</p>
 
           {/* Unplaced cards */}
           <div className="flex flex-wrap gap-2 mb-4 min-h-12">
@@ -1377,7 +1377,7 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
           {allPlaced && (
             <div className="mt-4">
               <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
-                Mooi! Je herkent nu het verschil. Alles wat je op een manometer afleest is effectief. Alles wat als referentie dient (atmosferisch, vacuüm) is absoluut.
+                Mooi! Je herkent nu het verschil. Alles wat je op een <span className="font-bold">manometer</span> afleest is <span className="font-bold">effectief</span>. Alles wat als referentie dient (atmosferisch, vacuüm) is <span className="font-bold">absoluut</span>.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
@@ -1467,7 +1467,7 @@ function ConversionPanel({ onComplete, onLoseLife, lives }) {
       <div className="max-w-2xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
         <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>De omrekenmachine</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Je bent bij een koelinstallatie. Lees elke manometer af en vul de <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> in.</p>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Je bent bij een koelinstallatie. Lees elke <span className="font-bold">manometer</span> af en vul de <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> in.</p>
 
           <div className="space-y-4 mb-4">
             {tasks.map((task, i) => (
@@ -1523,8 +1523,8 @@ function ConversionPanel({ onComplete, onLoseLife, lives }) {
             <div className="mt-3">
               <div className="p-3 rounded-xl text-sm mb-3 text-white italic" style={{ background: allCorrect ? '#1E8F6E' : '#D92C2C' }}>
                 {allCorrect
-                  ? 'Uitstekend! Je snapt het principe volledig. Onthoud dit goed, want in missie 2 ga je dit toepassen op het h-log p diagram.'
-                  : 'Het principe: absoluut = effectief + 1. Ook bij onderdruk! Probeer het nog eens.'}
+                  ? <>Uitstekend! Je snapt het principe volledig. Onthoud dit goed, want in missie 2 ga je dit toepassen op het <span className="font-bold">h-log p diagram</span>.</>
+                  : <>Het principe: <span className="font-bold">absoluut = effectief + 1</span>. Ook bij onderdruk! Probeer het nog eens.</>}
               </div>
               <button onClick={() => onComplete(totalPoints)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
@@ -1552,13 +1552,13 @@ function M2IntroScreen({ onBegin }) {
           <h2 className="text-xl font-extrabold" style={{ color: '#0D4868' }}>Missie 2: Het Bootje</h2>
         </div>
         <p className="italic leading-relaxed mb-2" style={{ color: '#5b7280', lineHeight: 1.7 }}>
-          Nu gaan we het koelproces in het h-log p diagram tekenen.
+          Nu gaan we het <span className="font-bold">koelproces</span> in het <span className="font-bold">h-log p diagram</span> tekenen.
         </p>
         <p className="italic leading-relaxed mb-2" style={{ color: '#5b7280', lineHeight: 1.7 }}>
           Dit heeft de vorm van een <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>bootje</span>.
         </p>
         <p className="italic leading-relaxed mb-6" style={{ color: '#5b7280', lineHeight: 1.7 }}>
-          Elk hoofdcomponent heeft zijn eigen plek in het h-log p diagram. Plaats deze in het diagram en ontdek hoe het koelproces loopt.
+          Elk <span className="font-bold">hoofdcomponent</span> heeft zijn eigen plek in het h-log p diagram. Plaats deze in het diagram en ontdek hoe het koelproces loopt.
         </p>
         <div className="mb-6 opacity-30">
           <HLogPDiagram points={BOOTJE_POINTS} lines={BOOTJE_LINES} />
@@ -1677,7 +1677,7 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
       <div className="max-w-3xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
         <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Componenten plaatsen</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Hier zie je het bootje in het h-log p diagram. Elke lijn is een onderdeel van het koelsysteem. <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Sleep een component naar de juiste lijn!</span></p>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Hier zie je het <span className="font-bold">bootje</span> in het h-log p diagram. Elke <span className="font-bold">lijn</span> is een onderdeel van het koelsysteem. <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Sleep een component naar de juiste lijn!</span></p>
 
           <div ref={svgRef} onClick={handleSvgClick} className="cursor-pointer mb-4">
             <HLogPDiagram
@@ -1737,7 +1737,7 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
           {allPlaced && (
             <div className="mt-2">
               <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
-                Je hebt alle vier de componenten op de juiste lijn geplaatst! Je ziet nu het complete bootje met alle onderdelen.
+                Je hebt <span className="font-bold">alle vier de componenten</span> op de <span className="font-bold">juiste lijn</span> geplaatst! Je ziet nu het complete bootje met alle onderdelen.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
@@ -2252,7 +2252,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
           {!allDone && (
             <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(48,181,174,0.08)', border: '1px solid #30B5AE', color: '#0D4868', animation: 'fadeInUp 0.3s' }}>
               <p>{phase?.description}</p>
-              {!animating && <p className="mt-2 text-xs" style={{ color: '#5b7280' }}>Trek een lijn tussen de twee punten, of klik ze aan.</p>}
+              {!animating && <p className="mt-2 text-xs" style={{ color: '#5b7280' }}><span className="font-bold">Trek een lijn</span> tussen de twee punten, of klik ze aan.</p>}
             </div>
           )}
 
@@ -2301,7 +2301,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
           {allDone && !animating && (
             <div className="mt-4">
               <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
-                Het bootje is compleet. Je hebt niet alleen geleerd waar de punten liggen, maar ook wat er in elke stap van het proces gebeurt. Goed gedaan!
+                Het <span className="font-bold">bootje</span> is compleet. Je hebt niet alleen geleerd waar de <span className="font-bold">punten</span> liggen, maar ook wat er in <span className="font-bold">elke stap</span> van het proces gebeurt. Goed gedaan!
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
@@ -2422,9 +2422,9 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
   }
 
   const stepTexts = [
-    { title: 'Nakoeling: Punt 3\' aanwijzen', desc: 'Het koudemiddel stroomt door de condensor van punt 2 naar punt 3. Wijs aan waar het door de vloeistoflijn gaat.' },
+    { title: 'Nakoeling: Punt 3\' aanwijzen', desc: <>Het koudemiddel stroomt door de <span className="font-bold">condensor</span> van punt 2 naar punt 3. Wijs aan waar het door de <span className="font-bold">vloeistoflijn</span> gaat.</> },
     null, // animation
-    { title: 'Oververhitting: Punt 1\' aanwijzen', desc: 'Het koudemiddel stroomt door de verdamper van punt 4 naar punt 1. Wijs aan waar het door de damplijn gaat.' },
+    { title: 'Oververhitting: Punt 1\' aanwijzen', desc: <>Het koudemiddel stroomt door de <span className="font-bold">verdamper</span> van punt 4 naar punt 1. Wijs aan waar het door de <span className="font-bold">damplijn</span> gaat.</> },
     null, // animation
   ];
   const currentText = step < 4 ? stepTexts[step] : null;
@@ -2520,7 +2520,7 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
           {step === 4 && (
             <div className="mt-4">
               <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
-                Goed gedaan! Je kent nu oververhitting en nakoeling. Oververhitting beschermt de compressor tegen vloeistofslag. Nakoeling voorkomt flashgas in de vloeistofleiding voor het expansieventiel.
+                Goed gedaan! Je kent nu <span className="font-bold">oververhitting</span> en <span className="font-bold">nakoeling</span>. Oververhitting beschermt de compressor tegen <span className="font-bold">vloeistofslag</span>. Nakoeling voorkomt <span className="font-bold">flashgas</span> in de vloeistofleiding voor het expansieventiel.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
@@ -2566,7 +2566,7 @@ function EndScreen({ score, onRestart }) {
         {/* Learning summary */}
         <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: 'rgba(30,143,110,0.1)', border: '2px solid #1E8F6E' }}>
           <p className="text-sm italic leading-relaxed" style={{ color: '#0D4868' }}>
-            Je hebt het bootje compleet in beeld. Je weet nu: een manometer leest effectief, maar in het h-log p diagram werk je altijd met <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span>. Tel er 1 bar bij op! En je kent de vier hoofdcomponenten: compressor, condensor, expansieventiel en verdamper.
+            Je hebt het bootje compleet in beeld. Je weet nu: een <span className="font-bold">manometer</span> leest <span className="font-bold">effectief</span>, maar in het h-log p diagram werk je altijd met <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span>. Tel er <span className="font-bold">1 bar</span> bij op! En je kent de vier hoofdcomponenten: compressor, condensor, expansieventiel en verdamper.
           </p>
         </div>
 
