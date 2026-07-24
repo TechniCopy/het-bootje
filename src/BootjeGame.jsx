@@ -85,7 +85,7 @@ const M2R3_PHASES = [
     description: 'Het koudemiddel is volledig gasvormig en wordt gecomprimeerd naar een gas van hoge druk en hoge temperatuur. Verbind de punten waar dit gebeurt.',
     correctFrom: 1, correctTo: 2,
     componentName: 'Compressor',
-    tooltip: 'De compressor comprimeert het gas. Druk én temperatuur stijgen sterk.',
+    tooltip: 'De compressor comprimeert het gas. Druk en temperatuur stijgen sterk.',
     color: '#2563EB',
   },
   {
@@ -134,7 +134,7 @@ const OVH_NAK_PHASES = [
       if (t < 0.12) return { temp: 60 - t / 0.12 * (60 - 43), pressure: p, region: 'vapor', bubbleIntensity: 0, label: 'Oververhitte damp' };
       if (t < 0.85) {
         const coexT = (t - 0.12) / 0.73;
-        return { temp: 43, pressure: p, region: 'coexistence', bubbleIntensity: 1 - coexT, label: `Condensatie — ${Math.round((1 - coexT) * 100)}% damp` };
+        return { temp: 43, pressure: p, region: 'coexistence', bubbleIntensity: 1 - coexT, label: `Condensatie: ${Math.round((1 - coexT) * 100)}% damp` };
       }
       // After liquid line = subcooling (nakoeling)
       const subT = (t - 0.85) / 0.15;
@@ -153,7 +153,7 @@ const OVH_NAK_PHASES = [
       const p = 3;
       if (t < 0.89) {
         const coexT = t / 0.89;
-        return { temp: 8.5, pressure: p, region: 'coexistence', bubbleIntensity: 0.2 + coexT * 0.8, label: `Verdamping — ${Math.round(coexT * 100)}% damp` };
+        return { temp: 8.5, pressure: p, region: 'coexistence', bubbleIntensity: 0.2 + coexT * 0.8, label: `Verdamping: ${Math.round(coexT * 100)}% damp` };
       }
       // After vapor line = superheat (oververhitting)
       const supT = (t - 0.89) / 0.11;
@@ -179,7 +179,7 @@ const ITEMBANKS = {
       options: ['Atmosferische druk is altijd 2 bar', 'Atmosferische druk is de absolute druk t.o.v. vacuüm, ongeveer 1 bar op zeeniveau', 'Atmosferische druk bestaat niet', 'Atmosferische druk verandert nooit'],
       correct: 1,
       feedbackCorrect: 'Precies. Op zeeniveau is dat ongeveer 1 bar absoluut.',
-      feedbackWrong: 'Atmosferische druk is de druk van de lucht om ons heen — ongeveer 1 bar op zeeniveau, gemeten vanaf vacuüm.' },
+      feedbackWrong: 'Atmosferische druk is de druk van de lucht om ons heen, ongeveer 1 bar op zeeniveau, gemeten vanaf vacuüm.' },
   ],
   m1r2_check: [
     { question: 'Je pompt een autoband op tot 2,5 bar volgens de manometer. Hoeveel bar wordt er extra door de lucht in de band uitgeoefend bovenop de buitenlucht?',
@@ -367,10 +367,10 @@ const H_GRID = [100, 150, 200, 250, 300, 350, 400, 450, 500];
 
 // Point descriptions for M2R2
 const POINT_DESCRIPTIONS = [
-  { id: 1, title: 'Punt 1 — Aanzuig compressor', desc: 'Oververhit gas, lage druk — rechts onder, net buiten het coexistentiegebied' },
-  { id: 2, title: 'Punt 2 — Uit compressor', desc: 'Oververhit gas, hoge druk — rechts boven, ver buiten het coexistentiegebied' },
-  { id: 3, title: 'Punt 3 — Uit condensor', desc: 'Vloeistof, hoge druk — links boven, net links van het coexistentiegebied' },
-  { id: 4, title: 'Punt 4 — Na expansieventiel', desc: 'Mix vloeistof/damp, lage druk — midden onder, in het coexistentiegebied' },
+  { id: 1, title: 'Punt 1: Aanzuig compressor', desc: 'Oververhit gas, lage druk, rechts onder, net buiten het coexistentiegebied' },
+  { id: 2, title: 'Punt 2: Uit compressor', desc: 'Oververhit gas, hoge druk, rechts boven, ver buiten het coexistentiegebied' },
+  { id: 3, title: 'Punt 3: Uit condensor', desc: 'Vloeistof, hoge druk, links boven, net links van het coexistentiegebied' },
+  { id: 4, title: 'Punt 4: Na expansieventiel', desc: 'Mix vloeistof/damp, lage druk, midden onder, in het coexistentiegebied' },
 ];
 
 // ═══════════════════════════════════════════════════════════════
@@ -424,7 +424,7 @@ function getMissionAndRound(screen) {
 
 const ComponentIcon = ({ type, size = 20, className = '' }) => {
   const s = size;
-  const col = className.includes('text-white') ? 'white' : '#2C1810';
+  const col = className.includes('text-white') ? 'white' : '#0D4868';
   switch (type) {
     case 'compressor':
       // Hermetic compressor: rounded body with pipes on top
@@ -488,7 +488,7 @@ function ProgressBar({ screen, lives, score }) {
   const { mission, round } = getMissionAndRound(screen);
   if (mission === 0) return null;
   return (
-    <div className="flex items-center gap-3 px-4 py-2 text-sm" style={{ background: '#2C1810' }}>
+    <div className="flex items-center gap-3 px-4 py-2 text-sm" style={{ background: 'linear-gradient(120deg,#0D4868 0%,#1b7f96 55%,#30B5AE 100%)' }}>
       <span className="font-bold text-white">Missie {mission}</span>
       <span className="text-white/40">|</span>
       <div className="flex gap-1">
@@ -496,17 +496,17 @@ function ProgressBar({ screen, lives, score }) {
           <div key={r} className={`w-3 h-3 rounded-full border-2 border-white/60 ${r <= round ? 'bg-white' : 'bg-transparent'}`} />
         ))}
       </div>
-      {screen.includes('_check') && <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>Check</span>}
+      {screen.includes('_check') && <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Check</span>}
       <div className="ml-auto flex items-center gap-3">
         <div className="flex gap-0.5">
           {[1, 2, 3, 4, 5].map(h => (
             <Heart key={h} className="w-4 h-4 transition-all duration-300"
-              fill={h <= lives ? '#E74C3C' : 'transparent'}
-              stroke={h <= lives ? '#E74C3C' : '#8B7355'}
+              fill={h <= lives ? '#D92C2C' : 'transparent'}
+              stroke={h <= lives ? '#D92C2C' : '#8a97a3'}
               style={{ opacity: h <= lives ? 1 : 0.3 }} />
           ))}
         </div>
-        <span className="text-white font-bold text-sm">Score: <span style={{ color: '#FBBF24' }}>{score}</span></span>
+        <span className="text-white font-bold text-sm">Score: <span style={{ color: '#99D3D8' }}>{score}</span></span>
       </div>
     </div>
   );
@@ -515,20 +515,20 @@ function ProgressBar({ screen, lives, score }) {
 function FeedbackPopup({ feedback, onClose }) {
   if (!feedback) return null;
   const isCorrect = feedback.type === 'correct';
-  const bg = isCorrect ? '#6B8E3D' : '#B84A3D';
+  const bg = isCorrect ? '#1E8F6E' : '#D92C2C';
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30" onClick={onClose}>
       <div
         className="mx-4 max-w-md p-6 rounded-2xl shadow-2xl text-center bg-white"
-        style={{ border: '2px solid #2C1810', animation: 'fadeInUp 0.3s ease-out' }}
+        style={{ border: '2px solid #0D4868', animation: 'fadeInUp 0.3s ease-out' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full mb-3" style={{ background: bg }}>
           {isCorrect ? <Check className="text-white" size={24} /> : <X className="text-white" size={24} />}
         </div>
-        <p className="text-sm leading-relaxed italic" style={{ color: '#2C1810' }}>{feedback.text}</p>
+        <p className="text-sm leading-relaxed italic" style={{ color: '#0D4868' }}>{feedback.text}</p>
         <button onClick={onClose} className="mt-4 px-6 py-2 rounded-xl text-white font-bold italic hover:brightness-90 active:scale-95"
-          style={{ background: bg, border: '2px solid #2C1810', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
+          style={{ background: bg, border: '2px solid #0D4868', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
           OK
         </button>
       </div>
@@ -559,34 +559,34 @@ function DebugNav({ visible, currentScreen, onNavigate, onClose }) {
   const navBtn = (screen, label, bg, color) => (
     <button key={screen} onClick={() => onNavigate(screen)}
       className="w-full text-left px-4 py-2.5 rounded-lg font-semibold text-sm hover:brightness-90 active:scale-[0.98] transition-all"
-      style={{ background: currentScreen === screen ? '#FBBF24' : bg, color: currentScreen === screen ? '#2C1810' : color }}>
+      style={{ background: currentScreen === screen ? '#99D3D8' : bg, color: currentScreen === screen ? '#0D4868' : color }}>
       {label}
     </button>
   );
 
   return (
     <div className="fixed inset-0 z-[300] flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-2xl p-6 w-80 max-h-[85vh] overflow-y-auto" style={{ background: '#F5EDD6', border: '3px solid #2C1810' }}>
+      <div className="rounded-2xl p-6 w-80 max-h-[85vh] overflow-y-auto" style={{ background: '#f2f7f8', border: '3px solid #0D4868' }}>
         <div className="flex justify-between items-center mb-5">
-          <span className="text-lg font-extrabold" style={{ color: '#2C1810' }}>Snelmenu (Ctrl+D)</span>
-          <button onClick={onClose} className="hover:opacity-70" style={{ color: '#2C1810' }}><X size={20} /></button>
+          <span className="text-lg font-extrabold" style={{ color: '#0D4868' }}>Snelmenu (Ctrl+D)</span>
+          <button onClick={onClose} className="hover:opacity-70" style={{ color: '#0D4868' }}><X size={20} /></button>
         </div>
 
         <div className="space-y-1.5">
           {menuItems.map((item, i) => {
             if (item.section) {
-              return <p key={i} className="text-sm font-bold pt-3 pb-1 first:pt-0" style={{ color: '#5C3A21' }}>{item.section}</p>;
+              return <p key={i} className="text-sm font-bold pt-3 pb-1 first:pt-0" style={{ color: '#5b7280' }}>{item.section}</p>;
             }
             if (item.isCheck) {
-              return navBtn(item.screen, item.label, '#FBBF24', '#2C1810');
+              return navBtn(item.screen, item.label, '#99D3D8', '#0D4868');
             }
-            return navBtn(item.screen, item.label, '#5C3A21', 'white');
+            return navBtn(item.screen, item.label, '#30B5AE', 'white');
           })}
         </div>
 
-        <div className="mt-4 pt-3 space-y-1.5" style={{ borderTop: '1px solid #d4c9a8' }}>
-          {navBtn('start', 'Startscherm', '#B84A3D', 'white')}
-          {navBtn('end', 'Eindscherm', '#B84A3D', 'white')}
+        <div className="mt-4 pt-3 space-y-1.5" style={{ borderTop: '1px solid #dbe7ea' }}>
+          {navBtn('start', 'Startscherm', '#D92C2C', 'white')}
+          {navBtn('end', 'Eindscherm', '#D92C2C', 'white')}
         </div>
       </div>
     </div>
@@ -595,7 +595,7 @@ function DebugNav({ visible, currentScreen, onNavigate, onClose }) {
 
 function ScoreDisplay({ score }) {
   return (
-    <div className="absolute top-2 right-4 px-3 py-1 rounded-lg text-sm font-extrabold" style={{ color: '#FBBF24' }}>
+    <div className="absolute top-2 right-4 px-3 py-1 rounded-lg text-sm font-extrabold" style={{ color: '#99D3D8' }}>
       {score} / 100
     </div>
   );
@@ -697,31 +697,31 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
 
   return (
     <div className="max-w-lg mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-      <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+      <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
         {quizQs.length > 1 && (
-          <p className="text-xs font-bold mb-2" style={{ color: '#5C3A21' }}>Vraag {qIdx + 1} van {quizQs.length}</p>
+          <p className="text-xs font-bold mb-2" style={{ color: '#5b7280' }}>Vraag {qIdx + 1} van {quizQs.length}</p>
         )}
-        <h3 className="text-lg font-bold italic mb-4" style={{ color: '#2C1810' }}>{quizQ.question}</h3>
+        <h3 className="text-lg font-bold italic mb-4" style={{ color: '#0D4868' }}>{quizQ.question}</h3>
         <div className="space-y-2 mb-4">
           {quizQ.options.map((opt, i) => {
-            let optStyle = { border: '2px solid #e8e0c8', background: '#FAFAF5' };
+            let optStyle = { border: '2px solid #dbe7ea', background: '#f8fbfc' };
             let extra = 'hover:brightness-95 cursor-pointer';
-            if (selected === i && !checked) { optStyle = { border: '2px solid #5C3A21', background: '#f0e8d0' }; }
-            if (checked && isCorrect && i === quizQ.correct) { optStyle = { border: '2px solid #6B8E3D', background: 'rgba(107,142,61,0.1)' }; }
-            if (checked && selected === i && i !== quizQ.correct) { optStyle = { border: '2px solid #B84A3D', background: 'rgba(184,74,61,0.1)' }; }
+            if (selected === i && !checked) { optStyle = { border: '2px solid #0D4868', background: '#e6f4f5' }; }
+            if (checked && isCorrect && i === quizQ.correct) { optStyle = { border: '2px solid #1E8F6E', background: 'rgba(30,143,110,0.1)' }; }
+            if (checked && selected === i && i !== quizQ.correct) { optStyle = { border: '2px solid #D92C2C', background: 'rgba(217,44,44,0.1)' }; }
             return (
               <button key={i} disabled={questionDone || checked} onClick={() => setSelected(i)}
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all ${extra}`} style={optStyle}>
-                <span style={{ color: '#2C1810' }}>{opt}</span>
-                {checked && isCorrect && i === quizQ.correct && <Check className="inline ml-2" size={16} style={{ color: '#6B8E3D' }} />}
-                {checked && selected === i && i !== quizQ.correct && <X className="inline ml-2" size={16} style={{ color: '#B84A3D' }} />}
+                <span style={{ color: '#0D4868' }}>{opt}</span>
+                {checked && isCorrect && i === quizQ.correct && <Check className="inline ml-2" size={16} style={{ color: '#1E8F6E' }} />}
+                {checked && selected === i && i !== quizQ.correct && <X className="inline ml-2" size={16} style={{ color: '#D92C2C' }} />}
               </button>
             );
           })}
         </div>
 
         {checked && (
-          <div className="p-3 rounded-xl text-sm mb-3 text-white italic" style={{ background: isCorrect ? '#6B8E3D' : '#B84A3D' }}>
+          <div className="p-3 rounded-xl text-sm mb-3 text-white italic" style={{ background: isCorrect ? '#1E8F6E' : '#D92C2C' }}>
             {isCorrect ? quizQ.feedbackCorrect : quizQ.feedbackWrong}
           </div>
         )}
@@ -729,21 +729,21 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
         {!checked && !questionDone && (
           <button onClick={handleCheck} disabled={selected === null}
             className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
+            style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
             Controleer
           </button>
         )}
         {isWrong && lives > 0 && (
           <button onClick={handleRetry}
             className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95"
-            style={{ background: '#B84A3D', border: '2px solid #2C1810', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
+            style={{ background: '#D92C2C', border: '2px solid #0D4868', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
             Probeer opnieuw
           </button>
         )}
         {questionDone && (
           <button onClick={handleNext}
             className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-            style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+            style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
             {isLast ? 'Afronden' : 'Volgende vraag'} <ChevronRight size={18} />
           </button>
         )}
@@ -758,28 +758,28 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
 
 function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlightLine = null, highlightPoint = null, dropZoneHighlight = null, showDropZones = false, onSvgClick, onPointClick, interactive = false, children }) {
   return (
-    <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full max-w-4xl mx-auto" style={{ backgroundColor: '#FAFAF5', borderRadius: 12, border: '2px solid #2C1810', maxHeight: 400 }} onClick={onSvgClick}>
+    <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full max-w-4xl mx-auto" style={{ backgroundColor: '#f8fbfc', borderRadius: 12, border: '2px solid #0D4868', maxHeight: 400 }} onClick={onSvgClick}>
       {/* Grid lines (dashed) */}
       {P_GRID.map(p => {
         const y = pressureToY(p);
         return <g key={`pg${p}`}>
           <line x1={PLOT.left} y1={y} x2={PLOT.right} y2={y} stroke="#ddd" strokeWidth="1" strokeDasharray="4 4" />
-          <text x={PLOT.left - 8} y={y + 4} textAnchor="end" fontSize="11" fill="#888" fontFamily="Nunito, sans-serif">{p}</text>
+          <text x={PLOT.left - 8} y={y + 4} textAnchor="end" fontSize="11" fill="#888" fontFamily="Work Sans, sans-serif">{p}</text>
         </g>;
       })}
       {H_GRID.map(h => {
         const x = enthalpyToX(h);
         return <g key={`hg${h}`}>
           <line x1={x} y1={PLOT.top} x2={x} y2={PLOT.bottom} stroke="#ddd" strokeWidth="1" strokeDasharray="4 4" />
-          <text x={x} y={PLOT.bottom + 18} textAnchor="middle" fontSize="11" fill="#888" fontFamily="Nunito, sans-serif">{h}</text>
+          <text x={x} y={PLOT.bottom + 18} textAnchor="middle" fontSize="11" fill="#888" fontFamily="Work Sans, sans-serif">{h}</text>
         </g>;
       })}
 
       {/* Axes */}
-      <line x1={PLOT.left} y1={PLOT.top} x2={PLOT.left} y2={PLOT.bottom} stroke="#2C1810" strokeWidth="2" />
-      <line x1={PLOT.left} y1={PLOT.bottom} x2={PLOT.right} y2={PLOT.bottom} stroke="#2C1810" strokeWidth="2" />
-      <text x={20} y={SVG_H / 2} textAnchor="middle" fontSize="13" fill="#2C1810" fontWeight="700" fontFamily="Nunito, sans-serif" transform={`rotate(-90, 20, ${SVG_H / 2})`}>Druk P (bar) — log-schaal</text>
-      <text x={SVG_W / 2} y={SVG_H - 8} textAnchor="middle" fontSize="13" fill="#2C1810" fontWeight="700" fontFamily="Nunito, sans-serif">Enthalpie h (kJ/kg)</text>
+      <line x1={PLOT.left} y1={PLOT.top} x2={PLOT.left} y2={PLOT.bottom} stroke="#0D4868" strokeWidth="2" />
+      <line x1={PLOT.left} y1={PLOT.bottom} x2={PLOT.right} y2={PLOT.bottom} stroke="#0D4868" strokeWidth="2" />
+      <text x={20} y={SVG_H / 2} textAnchor="middle" fontSize="13" fill="#0D4868" fontWeight="700" fontFamily="Work Sans, sans-serif" transform={`rotate(-90, 20, ${SVG_H / 2})`}>Druk P (bar), log-schaal</text>
+      <text x={SVG_W / 2} y={SVG_H - 8} textAnchor="middle" fontSize="13" fill="#0D4868" fontWeight="700" fontFamily="Work Sans, sans-serif">Enthalpie h (kJ/kg)</text>
 
       {/* Phase region colors */}
       <path d={LIQUID_REGION_PATH} fill="rgba(59, 130, 246, 0.15)" />
@@ -791,8 +791,8 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
       <path d={VAPOR_PATH} fill="none" stroke="#EF4444" strokeWidth="2.5" />
 
       {/* Critical point */}
-      <circle cx={KX} cy={KY} r={6} fill="#2C1810" stroke="#fff" strokeWidth="2" />
-      <text x={KX + 12} y={KY - 8} fontSize="13" fontWeight="700" fill="#2C1810" fontFamily="Nunito, sans-serif">K</text>
+      <circle cx={KX} cy={KY} r={6} fill="#0D4868" stroke="#fff" strokeWidth="2" />
+      <text x={KX + 12} y={KY - 8} fontSize="13" fontWeight="700" fill="#0D4868" fontFamily="Work Sans, sans-serif">K</text>
 
       {/* Bootje lines */}
       {lines.map((line, i) => {
@@ -827,7 +827,7 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
         return (
           <g key={comp}>
             <rect x={mx + ox - 40} y={my + oy - 10} width="80" height="20" rx="4" fill="white" fillOpacity="0.9" stroke={info.color} strokeWidth="1" />
-            <text x={mx + ox} y={my + oy + 4} textAnchor="middle" fontSize="10" fill={info.color} fontWeight="bold" fontFamily="Nunito, sans-serif">{info.label}</text>
+            <text x={mx + ox} y={my + oy + 4} textAnchor="middle" fontSize="10" fill={info.color} fontWeight="bold" fontFamily="Work Sans, sans-serif">{info.label}</text>
           </g>
         );
       })}
@@ -847,8 +847,8 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
         const isHl = highlightLine === line.component;
         return (
           <rect key={`dz-${i}`} x={mx - w / 2} y={my - h / 2} width={w} height={h} rx="8"
-            fill={isHl ? 'rgba(184,74,61,0.15)' : 'rgba(44,24,16,0.06)'}
-            stroke={isHl ? '#B84A3D' : '#5C3A21'} strokeWidth="2" strokeDasharray="8 4"
+            fill={isHl ? 'rgba(217,44,44,0.15)' : 'rgba(13,72,104,0.06)'}
+            stroke={isHl ? '#D92C2C' : '#0D4868'} strokeWidth="2" strokeDasharray="8 4"
             style={{ transition: 'fill 0.3s, stroke 0.3s' }} />
         );
       })}
@@ -861,7 +861,7 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
           <g key={pt.id} onClick={e => { e.stopPropagation(); onPointClick?.(pt.id); }} style={{ cursor: interactive ? 'pointer' : 'default' }}>
             <circle cx={x} cy={y} r={isHl ? 16 : 12} fill="white" stroke={pt.color} strokeWidth={isHl ? 3 : 2}
               style={{ transition: 'r 0.2s, stroke-width 0.2s', animation: isHl ? 'pulse-glow 1s infinite' : 'none' }} />
-            <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={pt.color} fontWeight="bold" fontFamily="Nunito, sans-serif">{pt.id}</text>
+            <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={pt.color} fontWeight="bold" fontFamily="Work Sans, sans-serif">{pt.id}</text>
           </g>
         );
       })}
@@ -877,21 +877,21 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
 
 function StartScreen({ onStart }) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center p-8" style={{ background: '#f2f7f8' }}>
       <div className="text-center max-w-md" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style={{ background: 'rgba(251,191,36,0.2)' }}>
-          <Ship size={40} style={{ color: '#5C3A21' }} />
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-4" style={{ background: 'rgba(153,211,216,0.35)' }}>
+          <Ship size={40} style={{ color: '#0D4868' }} />
         </div>
-        <h1 className="text-4xl font-extrabold mb-1" style={{ color: '#2C1810' }}>Het Bootje</h1>
-        <h2 className="text-xl font-bold italic mb-4" style={{ color: '#5C3A21' }}>Druk & het h-log p diagram</h2>
-        <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <p className="italic leading-relaxed" style={{ color: '#5C3A21', lineHeight: 1.7 }}>
+        <h1 className="text-4xl font-extrabold mb-1" style={{ color: '#0D4868' }}>Het Bootje</h1>
+        <h2 className="text-xl font-bold italic mb-4" style={{ color: '#5b7280' }}>Druk & het h-log p diagram</h2>
+        <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <p className="italic leading-relaxed" style={{ color: '#5b7280', lineHeight: 1.7 }}>
             Leer alles over druk en het h-log p diagram. Ontdek het verschil tussen absolute en effectieve druk, en bouw het beroemde bootje op in het diagram!
           </p>
         </div>
         <button onClick={onStart}
           className="px-10 py-4 text-white rounded-2xl font-extrabold italic text-xl hover:brightness-90 active:scale-95 transition-all"
-          style={{ background: '#6B8E3D', border: '3px solid #2C1810', boxShadow: '0 4px 0 #4a6b2a' }}>
+          style={{ background: '#1E8F6E', border: '3px solid #0D4868', boxShadow: '0 4px 0 #166F56' }}>
           Start
         </button>
       </div>
@@ -905,20 +905,20 @@ function StartScreen({ onStart }) {
 
 function M1IntroScreen({ onBegin }) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#F5EDD6' }}>
-      <div className="max-w-lg bg-white rounded-2xl p-8" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', animation: 'fadeInUp 0.5s ease-out' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#f2f7f8' }}>
+      <div className="max-w-lg bg-white rounded-2xl p-8" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', animation: 'fadeInUp 0.5s ease-out' }}>
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(251,191,36,0.2)' }}><Gauge size={22} style={{ color: '#5C3A21' }} /></div>
-          <h2 className="text-xl font-extrabold" style={{ color: '#2C1810' }}>Missie 1 — Druk begrijpen</h2>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(153,211,216,0.35)' }}><Gauge size={22} style={{ color: '#0D4868' }} /></div>
+          <h2 className="text-xl font-extrabold" style={{ color: '#0D4868' }}>Missie 1: Druk begrijpen</h2>
         </div>
-        <div className="italic leading-relaxed mb-6" style={{ color: '#5C3A21', lineHeight: 1.7 }}>
-          <p className="font-extrabold text-lg mb-2" style={{ color: '#2C1810' }}>De manometer aflezen.</p>
+        <div className="italic leading-relaxed mb-6" style={{ color: '#5b7280', lineHeight: 1.7 }}>
+          <p className="font-extrabold text-lg mb-2" style={{ color: '#0D4868' }}>De manometer aflezen.</p>
           <p className="mb-2">Een manometer geeft de druk aan in een systeem. Maar daarnaast heb je ook nog de atmosferische druk.</p>
-          <p>In deze missie leer je het verschil tussen <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>absolute druk</span> en <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>effectieve druk</span>.</p>
+          <p>In deze missie leer je het verschil tussen <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> en <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>effectieve druk</span>.</p>
         </div>
         <button onClick={onBegin}
           className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-          style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+          style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
           Begin <ChevronRight size={18} />
         </button>
       </div>
@@ -963,11 +963,11 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
   const absPressure = Math.max(0, pressure + 1);
 
   return (
-    <div className="min-h-screen p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-2xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-        <div className="bg-white rounded-2xl p-6 mb-4" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>De fietsband</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5C3A21' }}>Pomp de fietsband op tot <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>2,5 bar</span> (effectieve druk) door de slider te schuiven.</p>
+        <div className="bg-white rounded-2xl p-6 mb-4" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>De fietsband</h3>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Pomp de fietsband op tot <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>2,5 bar</span> (effectieve druk) door de slider te schuiven.</p>
 
           <div className="flex items-start gap-3 mb-4">
             {/* Bike + Gauge column */}
@@ -983,35 +983,35 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
                 <circle cx="150" cy="95" r="2" fill="#374151" />
                 {[0,60,120,180,240,300].map(a => <line key={a} x1={150} y1={95} x2={150+22*Math.cos(a*Math.PI/180)} y2={95+22*Math.sin(a*Math.PI/180)} stroke="#9ca3af" strokeWidth="0.8" />)}
                 {/* Bottom bracket */}
-                <circle cx="90" cy="90" r="6" fill="none" stroke="#5C3A21" strokeWidth="2" />
+                <circle cx="90" cy="90" r="6" fill="none" stroke="#0D4868" strokeWidth="2" />
                 {/* Chain stay (BB to rear axle) */}
-                <line x1="90" y1="90" x2="50" y2="95" stroke="#5C3A21" strokeWidth="2.5" />
+                <line x1="90" y1="90" x2="50" y2="95" stroke="#0D4868" strokeWidth="2.5" />
                 {/* Seat stay (rear axle to seat tube top) */}
-                <line x1="50" y1="95" x2="85" y2="50" stroke="#5C3A21" strokeWidth="2" />
+                <line x1="50" y1="95" x2="85" y2="50" stroke="#0D4868" strokeWidth="2" />
                 {/* Seat tube (BB to seat) */}
-                <line x1="90" y1="90" x2="85" y2="50" stroke="#5C3A21" strokeWidth="2.5" />
+                <line x1="90" y1="90" x2="85" y2="50" stroke="#0D4868" strokeWidth="2.5" />
                 {/* Down tube (BB to head tube bottom) */}
-                <line x1="90" y1="90" x2="140" y2="60" stroke="#5C3A21" strokeWidth="2.5" />
+                <line x1="90" y1="90" x2="140" y2="60" stroke="#0D4868" strokeWidth="2.5" />
                 {/* Top tube (seat to head tube top) */}
-                <line x1="85" y1="50" x2="140" y2="50" stroke="#5C3A21" strokeWidth="2.5" />
+                <line x1="85" y1="50" x2="140" y2="50" stroke="#0D4868" strokeWidth="2.5" />
                 {/* Head tube */}
-                <line x1="140" y1="50" x2="140" y2="60" stroke="#5C3A21" strokeWidth="3" />
+                <line x1="140" y1="50" x2="140" y2="60" stroke="#0D4868" strokeWidth="3" />
                 {/* Fork */}
-                <line x1="140" y1="60" x2="150" y2="95" stroke="#5C3A21" strokeWidth="2" />
+                <line x1="140" y1="60" x2="150" y2="95" stroke="#0D4868" strokeWidth="2" />
                 {/* Handlebar */}
-                <line x1="135" y1="45" x2="148" y2="45" stroke="#2C1810" strokeWidth="3" strokeLinecap="round" />
-                <line x1="140" y1="45" x2="140" y2="50" stroke="#5C3A21" strokeWidth="2" />
+                <line x1="135" y1="45" x2="148" y2="45" stroke="#0D4868" strokeWidth="3" strokeLinecap="round" />
+                <line x1="140" y1="45" x2="140" y2="50" stroke="#0D4868" strokeWidth="2" />
                 {/* Seat */}
-                <line x1="80" y1="44" x2="92" y2="44" stroke="#2C1810" strokeWidth="4" strokeLinecap="round" />
-                <line x1="85" y1="44" x2="85" y2="50" stroke="#5C3A21" strokeWidth="2" />
+                <line x1="80" y1="44" x2="92" y2="44" stroke="#0D4868" strokeWidth="4" strokeLinecap="round" />
+                <line x1="85" y1="44" x2="85" y2="50" stroke="#0D4868" strokeWidth="2" />
                 {/* Pedals */}
                 <line x1="82" y1="88" x2="98" y2="92" stroke="#374151" strokeWidth="2" />
-                <line x1="80" y1="87" x2="84" y2="89" stroke="#2C1810" strokeWidth="3" strokeLinecap="round" />
-                <line x1="96" y1="91" x2="100" y2="93" stroke="#2C1810" strokeWidth="3" strokeLinecap="round" />
+                <line x1="80" y1="87" x2="84" y2="89" stroke="#0D4868" strokeWidth="3" strokeLinecap="round" />
+                <line x1="96" y1="91" x2="100" y2="93" stroke="#0D4868" strokeWidth="3" strokeLinecap="round" />
               </svg>
               {/* Gauge */}
               <PressureGauge value={pressure} max={4} size={100} />
-              <p className="text-[10px]" style={{ color: '#5C3A21' }}>Manometer</p>
+              <p className="text-[10px]" style={{ color: '#5b7280' }}>Manometer</p>
             </div>
 
             {/* Pressure bar visualization with arrows */}
@@ -1034,22 +1034,22 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
                 <div className="flex-1 flex justify-center">
                   <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="w-full" style={{ maxWidth: 280 }}>
                     {/* Bar background */}
-                    <rect x={barX} y={5} width={barW} height={barH} rx="4" fill="#FAFAF5" stroke="#2C1810" strokeWidth="2" />
+                    <rect x={barX} y={5} width={barW} height={barH} rx="4" fill="#f8fbfc" stroke="#0D4868" strokeWidth="2" />
 
                     {/* Atmospheric reference line (dashed, at 1 bar height) */}
-                    <line x1={barX - 4} y1={barBottom - atmPx} x2={barX + barW + 4} y2={barBottom - atmPx} stroke="#B84A3D" strokeWidth="1" strokeDasharray="3 2" />
+                    <line x1={barX - 4} y1={barBottom - atmPx} x2={barX + barW + 4} y2={barBottom - atmPx} stroke="#D92C2C" strokeWidth="1" strokeDasharray="3 2" />
 
                     {pressure >= 0 ? (
                       <>
                         {/* Positive: Red atmospheric (1 bar) at bottom */}
-                        <rect x={barX + 1} y={barBottom - atmPx} width={barW - 2} height={atmPx - 1} fill="#B84A3D" rx="0" />
-                        <text x={barX + barW / 2} y={barBottom - atmPx / 2 + 4} textAnchor="middle" fontSize="10" fill="white" fontWeight="bold" fontFamily="Nunito">1 bar</text>
+                        <rect x={barX + 1} y={barBottom - atmPx} width={barW - 2} height={atmPx - 1} fill="#D92C2C" rx="0" />
+                        <text x={barX + barW / 2} y={barBottom - atmPx / 2 + 4} textAnchor="middle" fontSize="10" fill="white" fontWeight="bold" fontFamily="Work Sans">1 bar</text>
 
                         {/* Green effective on top */}
                         {pressure > 0.05 && (
                           <>
-                            <rect x={barX + 1} y={barBottom - atmPx - effPx} width={barW - 2} height={effPx} fill="#6B8E3D" />
-                            {effPx > 16 && <text x={barX + barW / 2} y={barBottom - atmPx - effPx / 2 + 4} textAnchor="middle" fontSize="10" fill="white" fontWeight="bold" fontFamily="Nunito">{pressure.toFixed(1)}</text>}
+                            <rect x={barX + 1} y={barBottom - atmPx - effPx} width={barW - 2} height={effPx} fill="#1E8F6E" />
+                            {effPx > 16 && <text x={barX + barW / 2} y={barBottom - atmPx - effPx / 2 + 4} textAnchor="middle" fontSize="10" fill="white" fontWeight="bold" fontFamily="Work Sans">{pressure.toFixed(1)}</text>}
                           </>
                         )}
                       </>
@@ -1057,14 +1057,14 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
                       <>
                         {/* Negative: Only show absolute pressure worth of red */}
                         {absPressure > 0.01 && (
-                          <rect x={barX + 1} y={barBottom - absPx} width={barW - 2} height={absPx - 1} fill="#B84A3D" rx="0" />
+                          <rect x={barX + 1} y={barBottom - absPx} width={barW - 2} height={absPx - 1} fill="#D92C2C" rx="0" />
                         )}
-                        {absPx > 16 && <text x={barX + barW / 2} y={barBottom - absPx / 2 + 4} textAnchor="middle" fontSize="10" fill="white" fontWeight="bold" fontFamily="Nunito">{absPressure.toFixed(1)}</text>}
+                        {absPx > 16 && <text x={barX + barW / 2} y={barBottom - absPx / 2 + 4} textAnchor="middle" fontSize="10" fill="white" fontWeight="bold" fontFamily="Work Sans">{absPressure.toFixed(1)}</text>}
 
                         {/* Striped "missing" atmospheric zone */}
                         <defs>
                           <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
-                            <line x1="0" y1="0" x2="0" y2="6" stroke="#B84A3D" strokeWidth="1.5" opacity="0.3" />
+                            <line x1="0" y1="0" x2="0" y2="6" stroke="#D92C2C" strokeWidth="1.5" opacity="0.3" />
                           </pattern>
                         </defs>
                         <rect x={barX + 1} y={barBottom - atmPx} width={barW - 2} height={atmPx - absPx} fill="url(#hatch)" />
@@ -1072,11 +1072,11 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
                     )}
 
                     {/* 0 bar label */}
-                    <text x={barX + barW / 2} y={barBottom + 18} textAnchor="middle" fontSize="10" fill="#2C1810" fontWeight="bold" fontFamily="Nunito">0 bar</text>
+                    <text x={barX + barW / 2} y={barBottom + 18} textAnchor="middle" fontSize="10" fill="#0D4868" fontWeight="bold" fontFamily="Work Sans">0 bar</text>
 
                     {/* LEFT: atmospheric reference label */}
-                    <text x={barX - 6} y={barBottom - atmPx + 4} textAnchor="end" fontSize="9" fill="#B84A3D" fontWeight="bold" fontFamily="Nunito">1 bar →</text>
-                    <text x={barX - 6} y={barBottom - atmPx + 15} textAnchor="end" fontSize="8" fill="#B84A3D" fontWeight="600" fontFamily="Nunito">atmosferisch</text>
+                    <text x={barX - 6} y={barBottom - atmPx + 4} textAnchor="end" fontSize="9" fill="#D92C2C" fontWeight="bold" fontFamily="Work Sans">1 bar →</text>
+                    <text x={barX - 6} y={barBottom - atmPx + 15} textAnchor="end" fontSize="8" fill="#D92C2C" fontWeight="600" fontFamily="Work Sans">atmosferisch</text>
 
                     {/* RIGHT: Effective pressure arrow */}
                     {Math.abs(pressure) > 0.2 && (() => {
@@ -1087,11 +1087,11 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
                         const mid = (top + bot) / 2;
                         return (
                           <g>
-                            <line x1={arrowX} y1={top + 4} x2={arrowX} y2={bot - 4} stroke="#6B8E3D" strokeWidth="2" />
-                            <polygon points={`${arrowX-3},${top+8} ${arrowX+3},${top+8} ${arrowX},${top+2}`} fill="#6B8E3D" />
-                            <polygon points={`${arrowX-3},${bot-8} ${arrowX+3},${bot-8} ${arrowX},${bot-2}`} fill="#6B8E3D" />
-                            <text x={arrowX + 8} y={mid - 2} fontSize="9" fill="#6B8E3D" fontWeight="bold" fontFamily="Nunito">Effectief</text>
-                            <text x={arrowX + 8} y={mid + 9} fontSize="9" fill="#6B8E3D" fontWeight="bold" fontFamily="Nunito">{pressure.toFixed(1)} bar</text>
+                            <line x1={arrowX} y1={top + 4} x2={arrowX} y2={bot - 4} stroke="#1E8F6E" strokeWidth="2" />
+                            <polygon points={`${arrowX-3},${top+8} ${arrowX+3},${top+8} ${arrowX},${top+2}`} fill="#1E8F6E" />
+                            <polygon points={`${arrowX-3},${bot-8} ${arrowX+3},${bot-8} ${arrowX},${bot-2}`} fill="#1E8F6E" />
+                            <text x={arrowX + 8} y={mid - 2} fontSize="9" fill="#1E8F6E" fontWeight="bold" fontFamily="Work Sans">Effectief</text>
+                            <text x={arrowX + 8} y={mid + 9} fontSize="9" fill="#1E8F6E" fontWeight="bold" fontFamily="Work Sans">{pressure.toFixed(1)} bar</text>
                           </g>
                         );
                       } else {
@@ -1101,11 +1101,11 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
                         const mid = (top + bot) / 2;
                         return (
                           <g>
-                            <line x1={arrowX} y1={top + 4} x2={arrowX} y2={bot - 4} stroke="#B84A3D" strokeWidth="2" strokeDasharray="4 2" />
-                            <polygon points={`${arrowX-3},${top+8} ${arrowX+3},${top+8} ${arrowX},${top+2}`} fill="#B84A3D" />
-                            <polygon points={`${arrowX-3},${bot-8} ${arrowX+3},${bot-8} ${arrowX},${bot-2}`} fill="#B84A3D" />
-                            <text x={arrowX + 8} y={mid - 2} fontSize="9" fill="#B84A3D" fontWeight="bold" fontFamily="Nunito">Effectief</text>
-                            <text x={arrowX + 8} y={mid + 9} fontSize="9" fill="#B84A3D" fontWeight="bold" fontFamily="Nunito">{pressure.toFixed(1)} bar</text>
+                            <line x1={arrowX} y1={top + 4} x2={arrowX} y2={bot - 4} stroke="#D92C2C" strokeWidth="2" strokeDasharray="4 2" />
+                            <polygon points={`${arrowX-3},${top+8} ${arrowX+3},${top+8} ${arrowX},${top+2}`} fill="#D92C2C" />
+                            <polygon points={`${arrowX-3},${bot-8} ${arrowX+3},${bot-8} ${arrowX},${bot-2}`} fill="#D92C2C" />
+                            <text x={arrowX + 8} y={mid - 2} fontSize="9" fill="#D92C2C" fontWeight="bold" fontFamily="Work Sans">Effectief</text>
+                            <text x={arrowX + 8} y={mid + 9} fontSize="9" fill="#D92C2C" fontWeight="bold" fontFamily="Work Sans">{pressure.toFixed(1)} bar</text>
                           </g>
                         );
                       }
@@ -1119,11 +1119,11 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
                       const mid = (top + bot) / 2;
                       return (
                         <g>
-                          <line x1={arrowX} y1={top + 4} x2={arrowX} y2={bot - 4} stroke="#2C1810" strokeWidth="2" />
-                          <polygon points={`${arrowX-3},${top+8} ${arrowX+3},${top+8} ${arrowX},${top+2}`} fill="#2C1810" />
-                          <polygon points={`${arrowX-3},${bot-8} ${arrowX+3},${bot-8} ${arrowX},${bot-2}`} fill="#2C1810" />
-                          <text x={arrowX + 8} y={mid - 2} fontSize="9" fill="#2C1810" fontWeight="800" fontFamily="Nunito">Absoluut</text>
-                          <text x={arrowX + 8} y={mid + 9} fontSize="9" fill="#2C1810" fontWeight="bold" fontFamily="Nunito">{absPressure.toFixed(1)} bar</text>
+                          <line x1={arrowX} y1={top + 4} x2={arrowX} y2={bot - 4} stroke="#0D4868" strokeWidth="2" />
+                          <polygon points={`${arrowX-3},${top+8} ${arrowX+3},${top+8} ${arrowX},${top+2}`} fill="#0D4868" />
+                          <polygon points={`${arrowX-3},${bot-8} ${arrowX+3},${bot-8} ${arrowX},${bot-2}`} fill="#0D4868" />
+                          <text x={arrowX + 8} y={mid - 2} fontSize="9" fill="#0D4868" fontWeight="800" fontFamily="Work Sans">Absoluut</text>
+                          <text x={arrowX + 8} y={mid + 9} fontSize="9" fill="#0D4868" fontWeight="bold" fontFamily="Work Sans">{absPressure.toFixed(1)} bar</text>
                         </g>
                       );
                     })()}
@@ -1135,17 +1135,17 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
 
           {/* Slider: -1 to 4 bar */}
           <div className="mb-4">
-            <label className="flex items-center justify-between text-sm mb-1" style={{ color: '#5C3A21' }}>
+            <label className="flex items-center justify-between text-sm mb-1" style={{ color: '#5b7280' }}>
               <span>Manometerdruk</span>
-              <span className="font-mono font-bold" style={{ color: pressure < 0 ? '#B84A3D' : '#2C1810' }}>{pressure.toFixed(1)} bar</span>
+              <span className="font-mono font-bold" style={{ color: pressure < 0 ? '#D92C2C' : '#0D4868' }}>{pressure.toFixed(1)} bar</span>
             </label>
             <input type="range" min="-1" max="4" step="0.1" value={pressure} onChange={e => setPressure(parseFloat(e.target.value))}
-              className="w-full h-2 rounded-lg appearance-none cursor-pointer" style={{ background: '#e8e0c8', accentColor: '#5C3A21' }} />
-            <div className="flex justify-between text-xs mt-1" style={{ color: '#5C3A21' }}><span>-1</span><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div>
+              className="w-full h-2 rounded-lg appearance-none cursor-pointer" style={{ background: '#dbe7ea', accentColor: '#30B5AE' }} />
+            <div className="flex justify-between text-xs mt-1" style={{ color: '#5b7280' }}><span>-1</span><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div>
           </div>
 
           {targetReached && !showQuestion && (
-            <button onClick={handleMeten} className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95" style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615', animation: 'pop-in 0.3s ease-out' }}>
+            <button onClick={handleMeten} className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95" style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84', animation: 'pop-in 0.3s ease-out' }}>
               Meten
             </button>
           )}
@@ -1153,28 +1153,28 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
 
         {/* MC Question (NOT shuffled per spec) */}
         {showQuestion && (
-          <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', animation: 'fadeInUp 0.3s ease-out' }}>
-            <h4 className="font-bold mb-1" style={{ color: '#2C1810' }}>Vraag</h4>
-            <p className="text-sm mb-4 italic" style={{ color: '#5C3A21' }}>Je leest 2,5 bar af op de manometer. Wat is de <span className="font-bold">absolute druk</span> in de band?</p>
+          <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', animation: 'fadeInUp 0.3s ease-out' }}>
+            <h4 className="font-bold mb-1" style={{ color: '#0D4868' }}>Vraag</h4>
+            <p className="text-sm mb-4 italic" style={{ color: '#5b7280' }}>Je leest 2,5 bar af op de manometer. Wat is de <span className="font-bold">absolute druk</span> in de band?</p>
             <div className="space-y-2 mb-4">
               {options.map((opt, i) => {
-                let optStyle = { border: '2px solid #e8e0c8', background: '#FAFAF5' };
-                if (selected === i && !checked) { optStyle = { border: '2px solid #5C3A21', background: '#f0e8d0' }; }
-                if (checked && isCorrect && i === correctIdx) { optStyle = { border: '2px solid #6B8E3D', background: 'rgba(107,142,61,0.1)' }; }
-                if (checked && selected === i && i !== correctIdx) { optStyle = { border: '2px solid #B84A3D', background: 'rgba(184,74,61,0.1)' }; }
+                let optStyle = { border: '2px solid #dbe7ea', background: '#f8fbfc' };
+                if (selected === i && !checked) { optStyle = { border: '2px solid #0D4868', background: '#e6f4f5' }; }
+                if (checked && isCorrect && i === correctIdx) { optStyle = { border: '2px solid #1E8F6E', background: 'rgba(30,143,110,0.1)' }; }
+                if (checked && selected === i && i !== correctIdx) { optStyle = { border: '2px solid #D92C2C', background: 'rgba(217,44,44,0.1)' }; }
                 return (
                   <button key={i} disabled={done || checked} onClick={() => setSelected(i)}
                     className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all hover:brightness-95 cursor-pointer" style={optStyle}>
-                    <span style={{ color: '#2C1810' }}>{opt}</span>
-                    {checked && isCorrect && i === correctIdx && <Check className="inline ml-2" size={16} style={{ color: '#6B8E3D' }} />}
-                    {checked && selected === i && i !== correctIdx && <X className="inline ml-2" size={16} style={{ color: '#B84A3D' }} />}
+                    <span style={{ color: '#0D4868' }}>{opt}</span>
+                    {checked && isCorrect && i === correctIdx && <Check className="inline ml-2" size={16} style={{ color: '#1E8F6E' }} />}
+                    {checked && selected === i && i !== correctIdx && <X className="inline ml-2" size={16} style={{ color: '#D92C2C' }} />}
                   </button>
                 );
               })}
             </div>
 
             {checked && (
-              <div className="p-3 rounded-xl text-sm mb-3 text-white italic" style={{ background: isCorrect ? '#6B8E3D' : '#B84A3D' }}>
+              <div className="p-3 rounded-xl text-sm mb-3 text-white italic" style={{ background: isCorrect ? '#1E8F6E' : '#D92C2C' }}>
                 {isCorrect
                   ? 'Precies! De manometer laat zien hoeveel druk er bóvenop de buitenlucht zit. Buiten is het 1 bar atmosferische druk, dus absoluut = 2,5 + 1 = 3,5 bar.'
                   : 'Denk eraan: een manometer meet de druk bóvenop de atmosferische druk. Atmosferische druk is 1 bar. Dus absolute druk = effectieve druk + 1.'}
@@ -1184,21 +1184,21 @@ function BikeScene({ onComplete, onLoseLife, lives }) {
             {!checked && !done && (
               <button onClick={handleCheck} disabled={selected === null}
                 className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Controleer
               </button>
             )}
             {checked && !isCorrect && lives > 0 && (
               <button onClick={handleRetry}
                 className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95"
-                style={{ background: '#B84A3D', border: '2px solid #2C1810', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
+                style={{ background: '#D92C2C', border: '2px solid #0D4868', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
                 Probeer opnieuw
               </button>
             )}
             {done && (
               <button onClick={() => onComplete(isCorrect ? (attempts === 1 ? SCORING.m1r1.first : SCORING.m1r1.second) : 0)}
                 className="w-full py-3 rounded-xl font-bold italic text-white hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Volgende <ChevronRight size={18} />
               </button>
             )}
@@ -1304,12 +1304,12 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
       <div ref={ref} onClick={() => handleBinClick(type)}
         className="flex-1 min-h-48 rounded-xl p-4 transition-all cursor-pointer"
         style={{
-          border: isFlash ? '2px dashed #B84A3D' : isOver ? '2px dashed #6B8E3D' : selectedCard ? '2px dashed #5C3A21' : '2px dashed #2C1810',
-          background: isFlash ? 'rgba(184,74,61,0.1)' : isOver ? 'rgba(107,142,61,0.1)' : selectedCard ? 'rgba(92,58,33,0.05)' : '#FAFAF5'
+          border: isFlash ? '2px dashed #D92C2C' : isOver ? '2px dashed #1E8F6E' : selectedCard ? '2px dashed #0D4868' : '2px dashed #0D4868',
+          background: isFlash ? 'rgba(217,44,44,0.1)' : isOver ? 'rgba(30,143,110,0.1)' : selectedCard ? 'rgba(13,72,104,0.05)' : '#f8fbfc'
         }}>
         <div className="flex items-center gap-2 mb-3">
           {icon}
-          <span className="font-semibold text-sm" style={{ color: '#5C3A21' }}>{label}</span>
+          <span className="font-semibold text-sm" style={{ color: '#5b7280' }}>{label}</span>
         </div>
         <div className="space-y-2">
           {binCards.map(id => {
@@ -1319,8 +1319,8 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
                 onClick={e => { e.stopPropagation(); handleBinCardClick(id, type); }}
                 onPointerDown={e => { e.stopPropagation(); handleBinCardClick(id, type); handlePointerDown(e, id); }}
                 className="px-3 py-2 rounded-lg text-xs cursor-grab active:cursor-grabbing flex items-center gap-1"
-                style={{ background: 'rgba(107,142,61,0.1)', border: '1px solid #6B8E3D', color: '#2C1810', touchAction: 'none' }}>
-                <Check size={12} style={{ color: '#6B8E3D' }} /> {card.text}
+                style={{ background: 'rgba(30,143,110,0.1)', border: '1px solid #1E8F6E', color: '#0D4868', touchAction: 'none' }}>
+                <Check size={12} style={{ color: '#1E8F6E' }} /> {card.text}
               </div>
             );
           })}
@@ -1333,12 +1333,12 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
   const dragCard = dragging ? M1R2_CARDS.find(c => c.id === dragging.id) : null;
 
   return (
-    <div className="min-h-screen p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-2xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>Sorteerspel</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5C3A21' }}>Sorteer de kaartjes. Gaat het over <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>absolute druk</span> of over wat je op een <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>manometer</span> afleest?</p>
-          <p className="text-xs mb-4" style={{ color: '#5C3A21' }}>Sleep een kaartje naar de juiste bak, of klik en dan de bak.</p>
+        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Sorteerspel</h3>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Sorteer de kaartjes. Gaat het over <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> of over wat je op een <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>manometer</span> afleest?</p>
+          <p className="text-xs mb-4" style={{ color: '#5b7280' }}>Sleep een kaartje naar de juiste bak, of klik en dan de bak.</p>
 
           {/* Unplaced cards */}
           <div className="flex flex-wrap gap-2 mb-4 min-h-12">
@@ -1348,9 +1348,9 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
                 onPointerDown={e => handlePointerDown(e, card.id)}
                 className="px-3 py-2 rounded-lg text-sm transition-all cursor-grab active:cursor-grabbing select-none"
                 style={{
-                  border: selectedCard === card.id ? '2px solid #5C3A21' : '2px solid #2C1810',
-                  background: selectedCard === card.id ? '#f0e8d0' : 'white',
-                  color: '#2C1810',
+                  border: selectedCard === card.id ? '2px solid #0D4868' : '2px solid #0D4868',
+                  background: selectedCard === card.id ? '#e6f4f5' : 'white',
+                  color: '#0D4868',
                   boxShadow: selectedCard === card.id ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
                   transform: selectedCard === card.id ? 'scale(1.05)' : 'scale(1)',
                   opacity: dragging?.id === card.id ? 0.3 : 1,
@@ -1368,19 +1368,19 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
           </div>
 
           {feedback && (
-            <div className="mt-3 p-2 text-white rounded-xl text-sm text-center italic" style={{ background: '#B84A3D', animation: 'fadeInUp 0.2s' }}>
+            <div className="mt-3 p-2 text-white rounded-xl text-sm text-center italic" style={{ background: '#D92C2C', animation: 'fadeInUp 0.2s' }}>
               {feedback.text}
             </div>
           )}
 
           {allPlaced && (
             <div className="mt-4">
-              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#6B8E3D' }}>
+              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
                 Mooi! Je herkent nu het verschil. Alles wat je op een manometer afleest is effectief. Alles wat als referentie dient (atmosferisch, vacuüm) is absoluut.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Volgende <ChevronRight size={18} />
               </button>
             </div>
@@ -1393,7 +1393,7 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
         <div className="fixed pointer-events-none z-50 px-3 py-2 rounded-lg text-sm font-bold"
           style={{
             left: dragging.x, top: dragging.y, transform: 'translate(-50%, -50%)',
-            background: '#FBBF24', color: '#2C1810', border: '2px solid #2C1810',
+            background: '#99D3D8', color: '#0D4868', border: '2px solid #0D4868',
             boxShadow: '0 8px 24px rgba(0,0,0,0.2)', opacity: 0.95,
           }}>
           {dragCard.text}
@@ -1462,42 +1462,42 @@ function ConversionPanel({ onComplete, onLoseLife, lives }) {
   const maxAttemptsReached = results.every((r, i) => r === 'correct' || attempts[i] >= 2);
 
   return (
-    <div className="min-h-screen p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-2xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>De omrekenmachine</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5C3A21' }}>Je bent bij een koelinstallatie. Lees elke manometer af en vul de <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>absolute druk</span> in.</p>
+        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>De omrekenmachine</h3>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Je bent bij een koelinstallatie. Lees elke manometer af en vul de <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> in.</p>
 
           <div className="space-y-4 mb-4">
             {tasks.map((task, i) => (
               <div key={i} className="p-4 rounded-lg" style={{
-                border: results[i] === 'correct' ? '2px solid #6B8E3D' : results[i] === 'wrong' ? '2px solid #B84A3D' : '2px solid #e8e0c8',
-                background: results[i] === 'correct' ? 'rgba(107,142,61,0.1)' : results[i] === 'wrong' ? 'rgba(184,74,61,0.1)' : '#FAFAF5'
+                border: results[i] === 'correct' ? '2px solid #1E8F6E' : results[i] === 'wrong' ? '2px solid #D92C2C' : '2px solid #dbe7ea',
+                background: results[i] === 'correct' ? 'rgba(30,143,110,0.1)' : results[i] === 'wrong' ? 'rgba(217,44,44,0.1)' : '#f8fbfc'
               }}>
                 <div className="flex items-center gap-3 mb-2">
                   <PressureGauge value={Math.abs(task.effective)} max={Math.max(4, Math.ceil(Math.abs(task.effective) / 5) * 5)} size={70} />
                   <div className="flex-1">
-                    <p className="text-sm font-medium" style={{ color: '#2C1810' }}>{task.context}</p>
-                    <p className="text-xs" style={{ color: '#5C3A21' }}>Manometer leest: <span className="font-bold" style={{ color: '#2C1810' }}>{task.effective < 0 ? task.effective.toFixed(1).replace('.', ',') : task.effective} bar</span></p>
+                    <p className="text-sm font-medium" style={{ color: '#0D4868' }}>{task.context}</p>
+                    <p className="text-xs" style={{ color: '#5b7280' }}>Manometer leest: <span className="font-bold" style={{ color: '#0D4868' }}>{task.effective < 0 ? task.effective.toFixed(1).replace('.', ',') : task.effective} bar</span></p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm whitespace-nowrap" style={{ color: '#5C3A21' }}>Absolute druk:</label>
+                  <label className="text-sm whitespace-nowrap" style={{ color: '#5b7280' }}>Absolute druk:</label>
                   <input type="number" step="0.1" min="-1" max="20" value={answers[i]}
                     onChange={e => { const a = [...answers]; a[i] = e.target.value; setAnswers(a); }}
                     disabled={results[i] === 'correct' || attempts[i] >= 2}
                     className="w-24 px-2 py-1.5 rounded-lg text-sm focus:outline-none disabled:opacity-50"
-                    style={{ border: '2px solid #2C1810', background: (results[i] === 'correct' || attempts[i] >= 2) ? '#FAFAF5' : 'white', color: '#2C1810' }} />
-                  <span className="text-sm" style={{ color: '#5C3A21' }}>bar</span>
-                  {results[i] === 'correct' && <Check size={18} style={{ color: '#6B8E3D' }} />}
-                  {results[i] === 'wrong' && <X size={18} style={{ color: '#B84A3D' }} />}
+                    style={{ border: '2px solid #0D4868', background: (results[i] === 'correct' || attempts[i] >= 2) ? '#f8fbfc' : 'white', color: '#0D4868' }} />
+                  <span className="text-sm" style={{ color: '#5b7280' }}>bar</span>
+                  {results[i] === 'correct' && <Check size={18} style={{ color: '#1E8F6E' }} />}
+                  {results[i] === 'wrong' && <X size={18} style={{ color: '#D92C2C' }} />}
                   {results[i] === 'wrong' && attempts[i] >= 2 && (
-                    <span className="text-xs ml-1" style={{ color: '#5C3A21' }}>Antwoord: {task.absolute} bar</span>
+                    <span className="text-xs ml-1" style={{ color: '#5b7280' }}>Antwoord: {task.absolute} bar</span>
                   )}
                 </div>
                 {i === 2 && showHint3 && results[i] !== 'correct' && (
-                  <p className="mt-2 text-xs p-2 rounded" style={{ color: '#5C3A21', background: 'rgba(251,191,36,0.15)', border: '1px solid #FBBF24' }}>
-                    Pas op: een negatieve effectieve druk betekent onderdruk — minder dan de atmosferische druk. Gebruik de formule: absoluut = effectief + 1.
+                  <p className="mt-2 text-xs p-2 rounded" style={{ color: '#5b7280', background: 'rgba(153,211,216,0.3)', border: '1px solid #30B5AE' }}>
+                    Pas op: een negatieve effectieve druk betekent onderdruk: minder dan de atmosferische druk. Gebruik de formule: absoluut = effectief + 1.
                   </p>
                 )}
               </div>
@@ -1506,28 +1506,28 @@ function ConversionPanel({ onComplete, onLoseLife, lives }) {
 
           {!allChecked && (
             <button onClick={handleCheck} className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95"
-              style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+              style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
               Controleer
             </button>
           )}
 
           {allChecked && canRetry && !maxAttemptsReached && (
             <button onClick={handleRetry} className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95"
-              style={{ background: '#B84A3D', border: '2px solid #2C1810', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
+              style={{ background: '#D92C2C', border: '2px solid #0D4868', boxShadow: '0 3px 0 rgba(0,0,0,0.2)' }}>
               Corrigeer fouten
             </button>
           )}
 
           {(allCorrect || maxAttemptsReached) && (
             <div className="mt-3">
-              <div className="p-3 rounded-xl text-sm mb-3 text-white italic" style={{ background: allCorrect ? '#6B8E3D' : '#B84A3D' }}>
+              <div className="p-3 rounded-xl text-sm mb-3 text-white italic" style={{ background: allCorrect ? '#1E8F6E' : '#D92C2C' }}>
                 {allCorrect
                   ? 'Uitstekend! Je snapt het principe volledig. Onthoud dit goed, want in missie 2 ga je dit toepassen op het h-log p diagram.'
                   : 'Het principe: absoluut = effectief + 1. Ook bij onderdruk! Probeer het nog eens.'}
               </div>
               <button onClick={() => onComplete(totalPoints)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Volgende <ChevronRight size={18} />
               </button>
             </div>
@@ -1544,19 +1544,19 @@ function ConversionPanel({ onComplete, onLoseLife, lives }) {
 
 function M2IntroScreen({ onBegin }) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#F5EDD6' }}>
-      <div className="max-w-lg bg-white rounded-2xl p-8" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', animation: 'fadeInUp 0.5s ease-out' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#f2f7f8' }}>
+      <div className="max-w-lg bg-white rounded-2xl p-8" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', animation: 'fadeInUp 0.5s ease-out' }}>
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(251,191,36,0.2)' }}><Ship size={22} style={{ color: '#5C3A21' }} /></div>
-          <h2 className="text-xl font-extrabold" style={{ color: '#2C1810' }}>Missie 2 — Het Bootje</h2>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(153,211,216,0.35)' }}><Ship size={22} style={{ color: '#0D4868' }} /></div>
+          <h2 className="text-xl font-extrabold" style={{ color: '#0D4868' }}>Missie 2: Het Bootje</h2>
         </div>
-        <p className="italic leading-relaxed mb-2" style={{ color: '#5C3A21', lineHeight: 1.7 }}>
+        <p className="italic leading-relaxed mb-2" style={{ color: '#5b7280', lineHeight: 1.7 }}>
           Nu gaan we het koelproces in het h-log p diagram tekenen.
         </p>
-        <p className="italic leading-relaxed mb-2" style={{ color: '#5C3A21', lineHeight: 1.7 }}>
-          Dit heeft de vorm van een <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>bootje</span>.
+        <p className="italic leading-relaxed mb-2" style={{ color: '#5b7280', lineHeight: 1.7 }}>
+          Dit heeft de vorm van een <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>bootje</span>.
         </p>
-        <p className="italic leading-relaxed mb-6" style={{ color: '#5C3A21', lineHeight: 1.7 }}>
+        <p className="italic leading-relaxed mb-6" style={{ color: '#5b7280', lineHeight: 1.7 }}>
           Elk hoofdcomponent heeft zijn eigen plek in het h-log p diagram. Plaats deze in het diagram en ontdek hoe het koelproces loopt.
         </p>
         <div className="mb-6 opacity-30">
@@ -1564,7 +1564,7 @@ function M2IntroScreen({ onBegin }) {
         </div>
         <button onClick={onBegin}
           className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-          style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+          style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
           Aan de slag <ChevronRight size={18} />
         </button>
       </div>
@@ -1672,11 +1672,11 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
   const dragComp = dragging ? COMPONENTS_INFO.find(c => c.id === dragging.id) : null;
 
   return (
-    <div className="min-h-screen p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-3xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>Componenten plaatsen</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5C3A21' }}>Hier zie je het bootje in het h-log p diagram. Elke lijn is een onderdeel van het koelsysteem. <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>Sleep een component naar de juiste lijn!</span></p>
+        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Componenten plaatsen</h3>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Hier zie je het bootje in het h-log p diagram. Elke lijn is een onderdeel van het koelsysteem. <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Sleep een component naar de juiste lijn!</span></p>
 
           <div ref={svgRef} onClick={handleSvgClick} className="cursor-pointer mb-4">
             <HLogPDiagram
@@ -1709,8 +1709,8 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
                   {/* Circular icon */}
                   <div className="w-16 h-16 rounded-full flex items-center justify-center transition-all"
                     style={{
-                      background: isPlaced ? '#6B8E3D' : isSelected ? comp.color : '#2C1810',
-                      border: isSelected ? `3px solid ${comp.color}` : '3px solid #2C1810',
+                      background: isPlaced ? '#1E8F6E' : isSelected ? comp.color : '#0D4868',
+                      border: isSelected ? `3px solid ${comp.color}` : '3px solid #0D4868',
                       boxShadow: isSelected ? `0 0 0 3px ${comp.color}40, 0 4px 12px rgba(0,0,0,0.2)` : '0 2px 8px rgba(0,0,0,0.15)',
                     }}>
                     {isPlaced ? <Check size={28} color="white" /> : <ComponentIcon type={comp.id} size={28} className="text-white" />}
@@ -1718,9 +1718,9 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
                   {/* Label */}
                   <div className="px-3 py-1 rounded-lg text-xs font-bold italic text-center min-w-[80px]"
                     style={{
-                      background: isPlaced ? '#6B8E3D' : comp.color,
+                      background: isPlaced ? '#1E8F6E' : comp.color,
                       color: 'white',
-                      border: '2px solid #2C1810',
+                      border: '2px solid #0D4868',
                     }}>
                     {comp.label}
                   </div>
@@ -1730,17 +1730,17 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
           </div>
 
           {feedback && (
-            <div className="p-2 text-white rounded-xl text-sm text-center italic mb-3" style={{ background: '#B84A3D' }}>{feedback.text}</div>
+            <div className="p-2 text-white rounded-xl text-sm text-center italic mb-3" style={{ background: '#D92C2C' }}>{feedback.text}</div>
           )}
 
           {allPlaced && (
             <div className="mt-2">
-              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#6B8E3D' }}>
+              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
                 Je hebt alle vier de componenten op de juiste lijn geplaatst! Je ziet nu het complete bootje met alle onderdelen.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Volgende <ChevronRight size={18} />
               </button>
             </div>
@@ -1753,11 +1753,11 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
         <div className="fixed pointer-events-none z-50 flex flex-col items-center gap-1"
           style={{ left: dragging.x, top: dragging.y, transform: 'translate(-50%, -50%)' }}>
           <div className="w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ background: dragComp.color, border: '3px solid #2C1810', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+            style={{ background: dragComp.color, border: '3px solid #0D4868', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
             <ComponentIcon type={dragComp.id} size={28} className="text-white" />
           </div>
           <div className="px-3 py-1 rounded-lg text-xs font-bold italic"
-            style={{ background: dragComp.color, color: 'white', border: '2px solid #2C1810' }}>
+            style={{ background: dragComp.color, color: 'white', border: '2px solid #0D4868' }}>
             {dragComp.label}
           </div>
         </div>
@@ -1813,11 +1813,11 @@ function PointPlacer({ onComplete, onLoseLife, lives }) {
   });
 
   return (
-    <div className="min-h-screen p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-3xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>Punten plaatsen</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5C3A21' }}>Sleep de vier punten naar hun juiste plek in het diagram. Gebruik de beschrijvingen om te bepalen waar ze horen.</p>
+        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Punten plaatsen</h3>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Sleep de vier punten naar hun juiste plek in het diagram. Gebruik de beschrijvingen om te bepalen waar ze horen.</p>
 
           <div ref={svgRef} onClick={handleSvgClick} className={`mb-4 ${selectedPoint ? 'cursor-crosshair' : ''}`}>
             <HLogPDiagram points={visiblePoints} lines={[]} />
@@ -1833,9 +1833,9 @@ function PointPlacer({ onComplete, onLoseLife, lives }) {
                   onClick={() => setSelectedPoint(isSelected ? null : pt.id)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all"
                   style={{
-                    border: '2px solid #2C1810',
-                    background: isPlaced ? 'rgba(107,142,61,0.1)' : isSelected ? '#f0e8d0' : 'white',
-                    color: isPlaced ? '#6B8E3D' : '#2C1810',
+                    border: '2px solid #0D4868',
+                    background: isPlaced ? 'rgba(30,143,110,0.1)' : isSelected ? '#e6f4f5' : 'white',
+                    color: isPlaced ? '#1E8F6E' : '#0D4868',
                     opacity: isPlaced ? 0.6 : 1,
                     cursor: isPlaced ? 'default' : 'pointer',
                     boxShadow: isSelected ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
@@ -1843,7 +1843,7 @@ function PointPlacer({ onComplete, onLoseLife, lives }) {
                   }}>
                   <span className="w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold" style={{ borderColor: pt.color, color: pt.color }}>{pt.id}</span>
                   <span className="text-xs">{pt.label}</span>
-                  {isPlaced && <Check size={12} style={{ color: '#6B8E3D' }} />}
+                  {isPlaced && <Check size={12} style={{ color: '#1E8F6E' }} />}
                 </button>
               );
             })}
@@ -1853,9 +1853,9 @@ function PointPlacer({ onComplete, onLoseLife, lives }) {
           <div className="grid grid-cols-2 gap-2 mb-3">
             {POINT_DESCRIPTIONS.map(pd => (
               <div key={pd.id} className="p-2 rounded-lg text-xs" style={{
-                border: placedPoints[pd.id] ? '2px solid #6B8E3D' : selectedPoint === pd.id ? '2px solid #5C3A21' : '2px solid #e8e0c8',
-                background: placedPoints[pd.id] ? 'rgba(107,142,61,0.1)' : selectedPoint === pd.id ? '#f0e8d0' : '#FAFAF5',
-                color: '#2C1810'
+                border: placedPoints[pd.id] ? '2px solid #1E8F6E' : selectedPoint === pd.id ? '2px solid #0D4868' : '2px solid #dbe7ea',
+                background: placedPoints[pd.id] ? 'rgba(30,143,110,0.1)' : selectedPoint === pd.id ? '#e6f4f5' : '#f8fbfc',
+                color: '#0D4868'
               }}>
                 <span className="font-semibold">{pd.title}</span>
                 <br />{pd.desc}
@@ -1864,17 +1864,17 @@ function PointPlacer({ onComplete, onLoseLife, lives }) {
           </div>
 
           {feedback && (
-            <div className="p-2 text-white rounded-xl text-sm text-center italic mb-3" style={{ background: '#B84A3D' }}>{feedback.text}</div>
+            <div className="p-2 text-white rounded-xl text-sm text-center italic mb-3" style={{ background: '#D92C2C' }}>{feedback.text}</div>
           )}
 
           {allPlaced && (
             <div className="mt-2">
-              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#6B8E3D' }}>
+              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
                 Mooi! Je hebt alle vier de punten op de juiste plek in het diagram gezet. Je snapt nu waar elk punt ligt op basis van de fase van het koudemiddel.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Volgende <ChevronRight size={18} />
               </button>
             </div>
@@ -2021,8 +2021,8 @@ function RefrigerantCanvas({ fraction, region }) {
       }
 
       // Label
-      ctx.fillStyle = '#2C1810';
-      ctx.font = 'bold 11px Nunito, sans-serif';
+      ctx.fillStyle = '#0D4868';
+      ctx.font = 'bold 11px "Work Sans", sans-serif';
       ctx.textAlign = 'center';
       if (region === 'liquid') ctx.fillText('Vloeistof', W / 2, 14);
       else if (region === 'vapor') ctx.fillText('Oververhitte damp', W / 2, 14);
@@ -2037,7 +2037,7 @@ function RefrigerantCanvas({ fraction, region }) {
     return () => { if (frameRef.current) cancelAnimationFrame(frameRef.current); };
   }, [fraction, region]);
 
-  return <canvas ref={canvasRef} width={140} height={90} style={{ display: 'block', borderRadius: 6, border: '2px solid #2C1810', background: '#FAFAF5' }} />;
+  return <canvas ref={canvasRef} width={140} height={90} style={{ display: 'block', borderRadius: 6, border: '2px solid #0D4868', background: '#f8fbfc' }} />;
 }
 
 function ProcessPanel({ progress, phaseIndex, customState }) {
@@ -2052,7 +2052,7 @@ function ProcessPanel({ progress, phaseIndex, customState }) {
   const gaugeR = 28;
 
   return (
-    <div className="rounded-lg p-2" style={{ background: '#FAFAF5', border: '2px solid #2C1810', width: 165 }}>
+    <div className="rounded-lg p-2" style={{ background: '#f8fbfc', border: '2px solid #0D4868', width: 165 }}>
       {/* Refrigerant canvas */}
       <RefrigerantCanvas fraction={state.bubbleIntensity || (state.region === 'vapor' ? 1 : 0)} region={state.region} />
 
@@ -2061,33 +2061,33 @@ function ProcessPanel({ progress, phaseIndex, customState }) {
         {/* Thermometer */}
         <div className="flex flex-col items-center">
           <svg width="28" height="52" viewBox="0 0 36 72">
-            <rect x="13" y="4" width="10" height="44" rx="5" fill="#f5f5f5" stroke="#2C1810" strokeWidth="1.5" />
+            <rect x="13" y="4" width="10" height="44" rx="5" fill="#f5f5f5" stroke="#0D4868" strokeWidth="1.5" />
             <rect x="14.5" y={4 + 42 * (1 - (state.temp + 20) / 120)} width="7"
               height={42 * ((state.temp + 20) / 120) + 2} rx="3.5" fill={tempColor} style={{ transition: 'all 0.15s' }} />
-            <circle cx="18" cy="58" r="10" fill={tempColor} stroke="#2C1810" strokeWidth="1.5" style={{ transition: 'fill 0.15s' }} />
-            <text x="18" y="61" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold" fontFamily="Nunito">{Math.round(state.temp)}°</text>
+            <circle cx="18" cy="58" r="10" fill={tempColor} stroke="#0D4868" strokeWidth="1.5" style={{ transition: 'fill 0.15s' }} />
+            <text x="18" y="61" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold" fontFamily="Work Sans">{Math.round(state.temp)}°</text>
           </svg>
-          <span className="text-[8px] font-bold" style={{ color: '#5C3A21' }}>{Math.round(state.temp)}°C</span>
+          <span className="text-[8px] font-bold" style={{ color: '#5b7280' }}>{Math.round(state.temp)}°C</span>
         </div>
 
         {/* Round barometer */}
         <div className="flex flex-col items-center">
           <svg width="52" height="52" viewBox="0 0 72 72">
-            <circle cx="36" cy="36" r={gaugeR + 4} fill="#f5f5f5" stroke="#2C1810" strokeWidth="2" />
-            <circle cx="36" cy="36" r={gaugeR} fill="white" stroke="#d4c9a8" strokeWidth="1" />
+            <circle cx="36" cy="36" r={gaugeR + 4} fill="#f5f5f5" stroke="#0D4868" strokeWidth="2" />
+            <circle cx="36" cy="36" r={gaugeR} fill="white" stroke="#dbe7ea" strokeWidth="1" />
             {[0, 5, 10, 15, 20].map(v => {
               const a = (-135 + (v / 20) * 270) * Math.PI / 180;
               return <g key={v}>
-                <line x1={36 + (gaugeR - 6) * Math.cos(a)} y1={36 + (gaugeR - 6) * Math.sin(a)} x2={36 + gaugeR * Math.cos(a)} y2={36 + gaugeR * Math.sin(a)} stroke="#2C1810" strokeWidth="1.5" />
-                <text x={36 + (gaugeR - 13) * Math.cos(a)} y={36 + (gaugeR - 13) * Math.sin(a) + 3} textAnchor="middle" fontSize="7" fill="#5C3A21" fontWeight="bold">{v}</text>
+                <line x1={36 + (gaugeR - 6) * Math.cos(a)} y1={36 + (gaugeR - 6) * Math.sin(a)} x2={36 + gaugeR * Math.cos(a)} y2={36 + gaugeR * Math.sin(a)} stroke="#0D4868" strokeWidth="1.5" />
+                <text x={36 + (gaugeR - 13) * Math.cos(a)} y={36 + (gaugeR - 13) * Math.sin(a) + 3} textAnchor="middle" fontSize="7" fill="#5b7280" fontWeight="bold">{v}</text>
               </g>;
             })}
             <line x1="36" y1="36" x2={36 + (gaugeR - 10) * Math.cos(na)} y2={36 + (gaugeR - 10) * Math.sin(na)}
               stroke="#DC2626" strokeWidth="2" strokeLinecap="round" style={{ transition: 'all 0.15s' }} />
-            <circle cx="36" cy="36" r="3" fill="#2C1810" />
-            <text x="36" y="50" textAnchor="middle" fontSize="7" fill="#5C3A21" fontWeight="bold">bar</text>
+            <circle cx="36" cy="36" r="3" fill="#0D4868" />
+            <text x="36" y="50" textAnchor="middle" fontSize="7" fill="#5b7280" fontWeight="bold">bar</text>
           </svg>
-          <span className="text-[8px] font-bold" style={{ color: '#5C3A21' }}>{state.pressure.toFixed(0)} bar</span>
+          <span className="text-[8px] font-bold" style={{ color: '#5b7280' }}>{state.pressure.toFixed(0)} bar</span>
         </div>
       </div>
     </div>
@@ -2242,16 +2242,16 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
   const animPhaseIdx = connectedLines.length - 1;
 
   return (
-    <div className="min-h-screen p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-3xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>Lijnen verbinden</h3>
-          {!allDone && <p className="text-xs mb-2" style={{ color: '#5C3A21' }}>Stap {currentPhase + 1} van 4</p>}
+        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Lijnen verbinden</h3>
+          {!allDone && <p className="text-xs mb-2" style={{ color: '#5b7280' }}>Stap {currentPhase + 1} van 4</p>}
 
           {!allDone && (
-            <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid #FBBF24', color: '#2C1810', animation: 'fadeInUp 0.3s' }}>
+            <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(48,181,174,0.08)', border: '1px solid #30B5AE', color: '#0D4868', animation: 'fadeInUp 0.3s' }}>
               <p>{phase?.description}</p>
-              {!animating && <p className="mt-2 text-xs" style={{ color: '#5C3A21' }}>Trek een lijn tussen de twee punten, of klik ze aan.</p>}
+              {!animating && <p className="mt-2 text-xs" style={{ color: '#5b7280' }}>Trek een lijn tussen de twee punten, of klik ze aan.</p>}
             </div>
           )}
 
@@ -2267,7 +2267,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
               {/* Drawing preview line */}
               {drawLineCoords && (
                 <line x1={drawLineCoords.x1} y1={drawLineCoords.y1} x2={drawLineCoords.x2} y2={drawLineCoords.y2}
-                  stroke="#5C3A21" strokeWidth="3" strokeDasharray="8 4" opacity="0.6" />
+                  stroke="#0D4868" strokeWidth="3" strokeDasharray="8 4" opacity="0.6" />
               )}
               {/* Animation dot */}
               {animating && (
@@ -2286,25 +2286,25 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
           </div>
 
           {animating && animPhaseIdx >= 0 && (
-            <p className="text-xs italic text-center mt-2 mb-2" style={{ color: '#5C3A21' }}>
+            <p className="text-xs italic text-center mt-2 mb-2" style={{ color: '#5b7280' }}>
               {M2R3_PHASES[animPhaseIdx]?.tooltip}
             </p>
           )}
 
           {flashWrong && (
-            <div className="p-2 text-white rounded-xl text-sm text-center italic mb-3 mt-3" style={{ background: '#B84A3D', animation: 'shake 0.3s' }}>
+            <div className="p-2 text-white rounded-xl text-sm text-center italic mb-3 mt-3" style={{ background: '#D92C2C', animation: 'shake 0.3s' }}>
               Dat is niet de juiste verbinding. Lees de omschrijving nog eens!
             </div>
           )}
 
           {allDone && !animating && (
             <div className="mt-4">
-              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#6B8E3D' }}>
+              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
                 Het bootje is compleet. Je hebt niet alleen geleerd waar de punten liggen, maar ook wat er in elke stap van het proces gebeurt. Goed gedaan!
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Volgende <ChevronRight size={18} />
               </button>
             </div>
@@ -2421,22 +2421,22 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
   }
 
   const stepTexts = [
-    { title: 'Nakoeling — Punt 3\' aanwijzen', desc: 'Het koudemiddel stroomt door de condensor van punt 2 naar punt 3. Wijs aan waar het door de vloeistoflijn gaat.' },
+    { title: 'Nakoeling: Punt 3\' aanwijzen', desc: 'Het koudemiddel stroomt door de condensor van punt 2 naar punt 3. Wijs aan waar het door de vloeistoflijn gaat.' },
     null, // animation
-    { title: 'Oververhitting — Punt 1\' aanwijzen', desc: 'Het koudemiddel stroomt door de verdamper van punt 4 naar punt 1. Wijs aan waar het door de damplijn gaat.' },
+    { title: 'Oververhitting: Punt 1\' aanwijzen', desc: 'Het koudemiddel stroomt door de verdamper van punt 4 naar punt 1. Wijs aan waar het door de damplijn gaat.' },
     null, // animation
   ];
   const currentText = step < 4 ? stepTexts[step] : null;
 
   return (
-    <div className="min-h-screen p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-3xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
-        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#2C1810' }}>Oververhitting & nakoeling</h3>
+        <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Oververhitting & nakoeling</h3>
 
           {/* Instruction */}
           {currentText && !showReady && (
-            <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid #FBBF24', color: '#2C1810', animation: 'fadeInUp 0.3s' }}>
+            <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(48,181,174,0.08)', border: '1px solid #30B5AE', color: '#0D4868', animation: 'fadeInUp 0.3s' }}>
               <p className="font-bold mb-1">{currentText.title}</p>
               <p>{currentText.desc}</p>
             </div>
@@ -2444,14 +2444,14 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
 
           {/* "Goed!" ready message before animation */}
           {showReady && (
-            <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(107,142,61,0.12)', border: '1px solid #6B8E3D', color: '#2C1810', animation: 'fadeInUp 0.3s' }}>
+            <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(30,143,110,0.12)', border: '1px solid #1E8F6E', color: '#0D4868', animation: 'fadeInUp 0.3s' }}>
               <p className="mb-2">
-                <span className="font-extrabold">Goed!</span> Gebied {readyPhase === 0 ? "3' en 3" : "1' – 1"} = de {readyPhase === 0 ? 'nakoeling' : 'oververhitting'}.
+                <span className="font-extrabold">Goed!</span> Gebied {readyPhase === 0 ? "3' en 3" : "1' en 1"} = de {readyPhase === 0 ? 'nakoeling' : 'oververhitting'}.
               </p>
               <p className="mb-3">Let goed op wat er met de <strong>temperatuur</strong> en <strong>fase</strong> gebeurt{readyPhase === 0 ? '!' : '.'}</p>
               <button onClick={handleStartAnimation}
                 className="w-full py-2 text-white rounded-lg font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#6B8E3D', border: '2px solid #2C1810', boxShadow: '0 3px 0 #4a6b2a' }}>
+                style={{ background: '#1E8F6E', border: '2px solid #0D4868', boxShadow: '0 3px 0 #166F56' }}>
                 Start animatie <ChevronRight size={18} />
               </button>
             </div>
@@ -2459,7 +2459,7 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
 
           {/* Animation explanation */}
           {isAnimating && currentPhase !== null && (
-            <div className="p-3 rounded-lg text-sm mb-4 italic" style={{ background: '#FAFAF5', border: '1px solid #e8e0c8', color: '#5C3A21' }}>
+            <div className="p-3 rounded-lg text-sm mb-4 italic" style={{ background: '#f8fbfc', border: '1px solid #dbe7ea', color: '#5b7280' }}>
               {OVH_NAK_PHASES[currentPhase].description}
             </div>
           )}
@@ -2475,17 +2475,17 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
               {placedPrimes.includes("3'") && (
                 <g>
                   <circle cx={pctToX(SUBCOOL_POINT.xPct)} cy={pctToY(SUBCOOL_POINT.yPct)} r={10} fill="white" stroke={SUBCOOL_POINT.color} strokeWidth="2.5" />
-                  <text x={pctToX(SUBCOOL_POINT.xPct)} y={pctToY(SUBCOOL_POINT.yPct) + 4} textAnchor="middle" fontSize="9" fill={SUBCOOL_POINT.color} fontWeight="bold" fontFamily="Nunito">3'</text>
+                  <text x={pctToX(SUBCOOL_POINT.xPct)} y={pctToY(SUBCOOL_POINT.yPct) + 4} textAnchor="middle" fontSize="9" fill={SUBCOOL_POINT.color} fontWeight="bold" fontFamily="Work Sans">3'</text>
                   {/* Nakoeling label */}
-                  <text x={pctToX(SUBCOOL_POINT.xPct)} y={pctToY(SUBCOOL_POINT.yPct) - 14} textAnchor="middle" fontSize="8" fill={SUBCOOL_POINT.color} fontWeight="bold" fontFamily="Nunito">Nakoeling</text>
+                  <text x={pctToX(SUBCOOL_POINT.xPct)} y={pctToY(SUBCOOL_POINT.yPct) - 14} textAnchor="middle" fontSize="8" fill={SUBCOOL_POINT.color} fontWeight="bold" fontFamily="Work Sans">Nakoeling</text>
                 </g>
               )}
               {placedPrimes.includes("1'") && (
                 <g>
                   <circle cx={pctToX(SUPERHEAT_POINT.xPct)} cy={pctToY(SUPERHEAT_POINT.yPct)} r={10} fill="white" stroke={SUPERHEAT_POINT.color} strokeWidth="2.5" />
-                  <text x={pctToX(SUPERHEAT_POINT.xPct)} y={pctToY(SUPERHEAT_POINT.yPct) + 4} textAnchor="middle" fontSize="9" fill={SUPERHEAT_POINT.color} fontWeight="bold" fontFamily="Nunito">1'</text>
+                  <text x={pctToX(SUPERHEAT_POINT.xPct)} y={pctToY(SUPERHEAT_POINT.yPct) + 4} textAnchor="middle" fontSize="9" fill={SUPERHEAT_POINT.color} fontWeight="bold" fontFamily="Work Sans">1'</text>
                   {/* Oververhitting label */}
-                  <text x={pctToX(SUPERHEAT_POINT.xPct)} y={pctToY(SUPERHEAT_POINT.yPct) - 14} textAnchor="middle" fontSize="8" fill={SUPERHEAT_POINT.color} fontWeight="bold" fontFamily="Nunito">Oververhitting</text>
+                  <text x={pctToX(SUPERHEAT_POINT.xPct)} y={pctToY(SUPERHEAT_POINT.yPct) - 14} textAnchor="middle" fontSize="8" fill={SUPERHEAT_POINT.color} fontWeight="bold" fontFamily="Work Sans">Oververhitting</text>
                 </g>
               )}
 
@@ -2507,23 +2507,23 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
 
           {/* Explanation after animation */}
           {isAnimating && currentPhase !== null && (
-            <p className="text-xs italic text-center mt-2" style={{ color: '#5C3A21' }}>
+            <p className="text-xs italic text-center mt-2" style={{ color: '#5b7280' }}>
               {OVH_NAK_PHASES[currentPhase].getState(animProgress).label}
             </p>
           )}
 
           {feedback && (
-            <div className="p-2 text-white rounded-xl text-sm text-center italic mt-3" style={{ background: '#B84A3D' }}>{feedback}</div>
+            <div className="p-2 text-white rounded-xl text-sm text-center italic mt-3" style={{ background: '#D92C2C' }}>{feedback}</div>
           )}
 
           {step === 4 && (
             <div className="mt-4">
-              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#6B8E3D' }}>
+              <div className="p-3 text-white rounded-xl text-sm italic mb-3" style={{ background: '#1E8F6E' }}>
                 Goed gedaan! Je kent nu oververhitting en nakoeling. Oververhitting beschermt de compressor tegen vloeistofslag. Nakoeling voorkomt flashgas in de vloeistofleiding voor het expansieventiel.
               </div>
               <button onClick={() => onComplete(points)}
                 className="w-full py-3 text-white rounded-xl font-bold italic hover:brightness-90 active:scale-95 flex items-center justify-center gap-2"
-                style={{ background: '#5C3A21', border: '2px solid #2C1810', boxShadow: '0 3px 0 #3d2615' }}>
+                style={{ background: '#30B5AE', border: '2px solid #0D4868', boxShadow: '0 3px 0 #1F8A84' }}>
                 Volgende <ChevronRight size={18} />
               </button>
             </div>
@@ -2542,36 +2542,36 @@ function EndScreen({ score, onRestart }) {
   const stars = score >= 90 ? 3 : score >= 70 ? 2 : score >= 50 ? 1 : 0;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-md text-center" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
         {/* Medal */}
         <div className="inline-flex items-center justify-center w-32 h-32 rounded-full mb-4 text-6xl"
-          style={{ background: 'linear-gradient(135deg, #FBBF24, #F59E0B)', border: '4px solid #2C1810', boxShadow: '0 8px 24px rgba(251,191,36,0.4)' }}>
+          style={{ background: 'linear-gradient(120deg,#0D4868 0%,#1b7f96 55%,#30B5AE 100%)', border: '4px solid #0D4868', boxShadow: '0 8px 24px rgba(48,181,174,0.4)' }}>
           &#127942;
         </div>
-        <h2 className="text-3xl font-extrabold mb-2" style={{ color: '#2C1810' }}>Gefeliciteerd!</h2>
+        <h2 className="text-3xl font-extrabold mb-2" style={{ color: '#0D4868' }}>Gefeliciteerd!</h2>
 
         {/* Score card */}
-        <div className="bg-white rounded-2xl p-6 mb-4" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+        <div className="bg-white rounded-2xl p-6 mb-4" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <div className="text-4xl mb-2">
             {[1, 2, 3].map(s => <span key={s} className="mx-1" style={{ color: s <= stars ? '#FBBF24' : '#ccc' }}>&#9733;</span>)}
           </div>
-          <p className="text-2xl font-extrabold mb-1" style={{ color: '#2C1810' }}>{score} / 100 punten</p>
-          <p className="text-sm italic" style={{ color: '#5C3A21' }}>
+          <p className="text-2xl font-extrabold mb-1" style={{ color: '#0D4868' }}>{score} / 100 punten</p>
+          <p className="text-sm italic" style={{ color: '#5b7280' }}>
             {stars === 3 ? 'Uitstekend!' : stars === 2 ? 'Goed gedaan!' : stars === 1 ? 'Aardig werk!' : 'Blijf oefenen!'}
           </p>
         </div>
 
         {/* Learning summary */}
-        <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: 'rgba(107,142,61,0.1)', border: '2px solid #6B8E3D' }}>
-          <p className="text-sm italic leading-relaxed" style={{ color: '#2C1810' }}>
-            Je hebt het bootje compleet in beeld. Je weet nu: een manometer leest effectief, maar in het h-log p diagram werk je altijd met <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#FBBF24', color: '#2C1810' }}>absolute druk</span>. Tel er 1 bar bij op! En je kent de vier hoofdcomponenten: compressor, condensor, expansieventiel en verdamper.
+        <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: 'rgba(30,143,110,0.1)', border: '2px solid #1E8F6E' }}>
+          <p className="text-sm italic leading-relaxed" style={{ color: '#0D4868' }}>
+            Je hebt het bootje compleet in beeld. Je weet nu: een manometer leest effectief, maar in het h-log p diagram werk je altijd met <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span>. Tel er 1 bar bij op! En je kent de vier hoofdcomponenten: compressor, condensor, expansieventiel en verdamper.
           </p>
         </div>
 
         <button onClick={onRestart}
           className="px-10 py-4 text-white rounded-2xl font-extrabold italic text-lg hover:brightness-90 active:scale-95 flex items-center justify-center gap-2 mx-auto"
-          style={{ background: '#5C3A21', border: '3px solid #2C1810', boxShadow: '0 4px 0 #3d2615' }}>
+          style={{ background: '#30B5AE', border: '3px solid #0D4868', boxShadow: '0 4px 0 #1F8A84' }}>
           <RotateCcw size={18} /> Opnieuw spelen
         </button>
       </div>
@@ -2589,19 +2589,19 @@ function EndScreen({ score, onRestart }) {
 
 function GameOverScreen({ score, onRestart }) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#F5EDD6' }}>
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: '#f2f7f8' }}>
       <div className="max-w-md text-center" style={{ animation: 'fadeInUp 0.5s ease-out' }}>
         <div className="flex justify-center gap-1 mb-4">
           {[1,2,3,4,5].map(i => <Heart key={i} className="w-8 h-8" fill="transparent" stroke="#ccc" style={{ opacity: 0.3 }} />)}
         </div>
-        <h2 className="text-3xl font-extrabold mb-2" style={{ color: '#B84A3D' }}>Game Over</h2>
-        <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: '2px solid #2C1810', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
-          <p className="italic mb-2" style={{ color: '#5C3A21' }}>Je hebt geen levens meer.</p>
-          <p className="text-lg font-bold" style={{ color: '#2C1810' }}>Score: {score} / 100</p>
+        <h2 className="text-3xl font-extrabold mb-2" style={{ color: '#D92C2C' }}>Game Over</h2>
+        <div className="bg-white rounded-2xl p-6 mb-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
+          <p className="italic mb-2" style={{ color: '#5b7280' }}>Je hebt geen levens meer.</p>
+          <p className="text-lg font-bold" style={{ color: '#0D4868' }}>Score: {score} / 100</p>
         </div>
         <button onClick={onRestart}
           className="px-10 py-4 text-white rounded-2xl font-extrabold italic text-lg hover:brightness-90 active:scale-95 flex items-center justify-center gap-2 mx-auto"
-          style={{ background: '#5C3A21', border: '3px solid #2C1810', boxShadow: '0 4px 0 #3d2615' }}>
+          style={{ background: '#30B5AE', border: '3px solid #0D4868', boxShadow: '0 4px 0 #1F8A84' }}>
           <RotateCcw size={18} /> Opnieuw proberen
         </button>
       </div>
@@ -2696,7 +2696,7 @@ export default function BootjeGame() {
         return <BikeScene onComplete={handleRoundComplete('m1r1_check')} onLoseLife={loseLife} lives={lives} />;
       case 'm1r1_check':
         return quizQuestion ? (
-          <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
+          <div className="min-h-screen p-4 pt-16" style={{ background: '#f2f7f8' }}>
             <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m1r1_check} onComplete={handleQuizComplete('m1r2')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
@@ -2704,7 +2704,7 @@ export default function BootjeGame() {
         return <SortingGame onComplete={handleRoundComplete('m1r2_check')} onLoseLife={loseLife} lives={lives} />;
       case 'm1r2_check':
         return quizQuestion ? (
-          <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
+          <div className="min-h-screen p-4 pt-16" style={{ background: '#f2f7f8' }}>
             <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m1r2_check} onComplete={handleQuizComplete('m1r3')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
@@ -2712,7 +2712,7 @@ export default function BootjeGame() {
         return <ConversionPanel onComplete={handleRoundComplete('m1r3_check')} onLoseLife={loseLife} lives={lives} />;
       case 'm1r3_check':
         return quizQuestion ? (
-          <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
+          <div className="min-h-screen p-4 pt-16" style={{ background: '#f2f7f8' }}>
             <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m1r3_check} onComplete={handleQuizComplete('m2_intro')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
@@ -2722,7 +2722,7 @@ export default function BootjeGame() {
         return <ComponentPlacer onComplete={handleRoundComplete('m2r1_check')} onLoseLife={loseLife} lives={lives} />;
       case 'm2r1_check':
         return quizQuestion ? (
-          <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
+          <div className="min-h-screen p-4 pt-16" style={{ background: '#f2f7f8' }}>
             <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m2r1_check} onComplete={handleQuizComplete('m2r3')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
@@ -2730,7 +2730,7 @@ export default function BootjeGame() {
         return <LineConnector onComplete={handleRoundComplete('m2r3_check')} onLoseLife={loseLife} lives={lives} />;
       case 'm2r3_check':
         return quizQuestion ? (
-          <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
+          <div className="min-h-screen p-4 pt-16" style={{ background: '#f2f7f8' }}>
             <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m2r3_check} onComplete={handleQuizComplete('m2r4')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
@@ -2738,7 +2738,7 @@ export default function BootjeGame() {
         return <SuperheatSubcool onComplete={handleRoundComplete('m2r4_check')} onLoseLife={loseLife} lives={lives} />;
       case 'm2r4_check':
         return quizQuestion ? (
-          <div className="min-h-screen p-4 pt-16" style={{ background: '#F5EDD6' }}>
+          <div className="min-h-screen p-4 pt-16" style={{ background: '#f2f7f8' }}>
             <QuizCheck quizQs={quizQuestion} maxPoints={SCORING.m2r4_check} onComplete={handleQuizComplete('end')} onLoseLife={loseLife} lives={lives} />
           </div>
         ) : null;
@@ -2754,7 +2754,7 @@ export default function BootjeGame() {
   const showProgress = screen !== 'start' && screen !== 'end' && screen !== 'game_over';
 
   return (
-    <div className="relative min-h-screen" style={{ background: '#F5EDD6' }}>
+    <div className="relative min-h-screen" style={{ background: '#f2f7f8' }}>
       {showProgress && <ProgressBar screen={screen} lives={lives} score={score} />}
       {renderScreen()}
       <DebugNav visible={debugVisible} currentScreen={screen} onNavigate={goToScreen} onClose={() => setDebugVisible(false)} />
