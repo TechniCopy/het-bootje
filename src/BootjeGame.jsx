@@ -488,26 +488,26 @@ function ProgressBar({ screen, lives, score }) {
   const { mission, round } = getMissionAndRound(screen);
   if (mission === 0) return null;
   return (
-    <div className="flex items-center gap-3 px-4 py-2 text-sm" style={{ background: 'linear-gradient(120deg,#0D4868 0%,#1b7f96 55%,#30B5AE 100%)' }}>
-      <img src="/studium-beeldmerk.png" alt="Studium" className="h-5 w-auto" />
-      <span className="font-bold text-white">Missie {mission}</span>
-      <span className="text-white/40">|</span>
+    <div className="flex items-center gap-1.5 px-2 sm:gap-3 sm:px-4 py-2 text-sm" style={{ background: 'linear-gradient(120deg,#0D4868 0%,#1b7f96 55%,#30B5AE 100%)' }}>
+      <img src="/studium-beeldmerk.png" alt="Studium" className="h-4 sm:h-5 w-auto" />
+      <span className="font-bold text-white whitespace-nowrap">Missie {mission}</span>
+      <span className="text-white/40 hidden sm:inline">|</span>
       <div className="flex gap-1">
         {Array.from({ length: getMissionAndRound(screen).total }, (_, i) => i + 1).map(r => (
           <div key={r} className={`w-3 h-3 rounded-full border-2 border-white/60 ${r <= round ? 'bg-white' : 'bg-transparent'}`} />
         ))}
       </div>
-      {screen.includes('_check') && <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Check</span>}
-      <div className="ml-auto flex items-center gap-3">
+      {screen.includes('_check') && <span className="ml-1 sm:ml-2 text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded whitespace-nowrap" style={{ background: '#99D3D8', color: '#0D4868' }}>Check</span>}
+      <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
         <div className="flex gap-0.5">
           {[1, 2, 3, 4, 5].map(h => (
-            <Heart key={h} className="w-4 h-4 transition-all duration-300"
+            <Heart key={h} className="w-3 h-3 sm:w-4 sm:h-4 transition-all duration-300"
               fill={h <= lives ? '#D92C2C' : 'transparent'}
               stroke={h <= lives ? '#D92C2C' : '#8a97a3'}
               style={{ opacity: h <= lives ? 1 : 0.3 }} />
           ))}
         </div>
-        <span className="text-white font-bold text-sm">Score: <span style={{ color: '#99D3D8' }}>{score}</span></span>
+        <span className="text-white font-bold text-sm whitespace-nowrap"><span className="hidden sm:inline">Score: </span><span style={{ color: '#99D3D8' }}>{score}</span></span>
       </div>
     </div>
   );
@@ -859,7 +859,9 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
         const x = pctToX(pt.xPct), y = pctToY(pt.yPct);
         const isHl = highlightPoint === pt.id;
         return (
-          <g key={pt.id} onClick={e => { e.stopPropagation(); onPointClick?.(pt.id); }} style={{ cursor: interactive ? 'pointer' : 'default' }}>
+          <g key={pt.id} onClick={e => { e.stopPropagation(); onPointClick?.(pt.id); }} style={{ cursor: interactive ? 'pointer' : 'default', touchAction: interactive ? 'none' : 'auto' }}>
+            {/* Invisible enlarged hit target for touch */}
+            {interactive && <circle cx={x} cy={y} r={26} fill="transparent" />}
             <circle cx={x} cy={y} r={isHl ? 16 : 12} fill="white" stroke={pt.color} strokeWidth={isHl ? 3 : 2}
               style={{ transition: 'r 0.2s, stroke-width 0.2s', animation: isHl ? 'pulse-glow 1s infinite' : 'none' }} />
             <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={pt.color} fontWeight="bold" fontFamily="Work Sans, sans-serif">{pt.id}</text>
@@ -1686,15 +1688,17 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Componenten plaatsen</h3>
           <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Hier zie je het <span className="font-bold">bootje</span> in het h-log p diagram. Elke <span className="font-bold">lijn</span> is een onderdeel van het koelsysteem. <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Sleep een component naar de juiste lijn!</span></p>
 
-          <div ref={svgRef} onClick={handleSvgClick} className="cursor-pointer mb-4">
-            <HLogPDiagram
-              points={BOOTJE_POINTS}
-              lines={BOOTJE_LINES}
-              componentLabels={placedComponents}
-              showDropZones={!allPlaced}
-              highlightLine={flashLine}
-              dropZoneHighlight={flashLine ? '#ef4444' : undefined}
-            />
+          <div className="overflow-x-auto mb-4">
+            <div ref={svgRef} onClick={handleSvgClick} className="cursor-pointer min-w-[560px] sm:min-w-0">
+              <HLogPDiagram
+                points={BOOTJE_POINTS}
+                lines={BOOTJE_LINES}
+                componentLabels={placedComponents}
+                showDropZones={!allPlaced}
+                highlightLine={flashLine}
+                dropZoneHighlight={flashLine ? '#ef4444' : undefined}
+              />
+            </div>
           </div>
 
           {/* Component cards (click + drag) */}
@@ -2126,7 +2130,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
     const svgY = ((clientY - rect.top) / rect.height) * SVG_H;
     for (const pt of BOOTJE_POINTS) {
       const px = pctToX(pt.xPct), py = pctToY(pt.yPct);
-      if (Math.sqrt((svgX - px) ** 2 + (svgY - py) ** 2) < 25) return pt.id;
+      if (Math.sqrt((svgX - px) ** 2 + (svgY - py) ** 2) < 26) return pt.id;
     }
     return null;
   };
@@ -2263,7 +2267,8 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
             </div>
           )}
 
-          <div className="relative" ref={svgRef} onPointerDown={handlePointerDown} style={{ touchAction: 'none' }}>
+          <div className="overflow-x-auto">
+          <div className="relative min-w-[560px] sm:min-w-0" ref={svgRef} onPointerDown={handlePointerDown}>
             <HLogPDiagram
               points={BOOTJE_POINTS}
               lines={visibleLines}
@@ -2291,6 +2296,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
                 <ProcessPanel progress={animProgress} phaseIndex={animPhaseIdx} />
               </div>
             )}
+          </div>
           </div>
 
           {animating && animPhaseIdx >= 0 && (
@@ -2473,7 +2479,8 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
           )}
 
           {/* Diagram */}
-          <div className="relative" ref={svgRef} onClick={handleDiagramClick} style={{ cursor: (!isAnimating && step !== 4) ? 'crosshair' : 'default' }}>
+          <div className="overflow-x-auto">
+          <div className="relative min-w-[560px] sm:min-w-0" ref={svgRef} onClick={handleDiagramClick} style={{ cursor: (!isAnimating && step !== 4) ? 'crosshair' : 'default' }}>
             <HLogPDiagram
               points={BOOTJE_POINTS}
               lines={BOOTJE_LINES}
@@ -2511,6 +2518,7 @@ function SuperheatSubcool({ onComplete, onLoseLife, lives }) {
                 <ProcessPanel progress={animProgress} phaseIndex={-1} customState={OVH_NAK_PHASES[currentPhase].getState(animProgress)} />
               </div>
             )}
+          </div>
           </div>
 
           {/* Explanation after animation */}
