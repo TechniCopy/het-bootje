@@ -757,7 +757,7 @@ function QuizCheck({ quizQs, maxPoints, onComplete, onLoseLife, lives }) {
 // H-LOG-P DIAGRAM (SVG)
 // ═══════════════════════════════════════════════════════════════
 
-function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlightLine = null, highlightPoint = null, dropZoneHighlight = null, showDropZones = false, onSvgClick, onPointClick, interactive = false, children }) {
+function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlightLine = null, highlightPoint = null, dropZoneHighlight = null, showDropZones = false, dropZoneActive = false, validTargets = [], onSvgClick, onPointClick, interactive = false, children }) {
   return (
     <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="w-full max-w-4xl mx-auto" style={{ backgroundColor: '#f8fbfc', borderRadius: 12, border: '2px solid #0D4868', maxHeight: 400 }} onClick={onSvgClick}>
       {/* Grid lines (dashed) */}
@@ -848,8 +848,8 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
         const isHl = highlightLine === line.component;
         return (
           <rect key={`dz-${i}`} x={mx - w / 2} y={my - h / 2} width={w} height={h} rx="8"
-            fill={isHl ? 'rgba(217,44,44,0.15)' : 'rgba(13,72,104,0.06)'}
-            stroke={isHl ? '#D92C2C' : '#0D4868'} strokeWidth="2" strokeDasharray="8 4"
+            fill={isHl ? 'rgba(217,44,44,0.15)' : dropZoneActive ? 'rgba(48,181,174,0.08)' : 'rgba(13,72,104,0.06)'}
+            stroke={isHl ? '#D92C2C' : dropZoneActive ? '#30B5AE' : '#0D4868'} strokeWidth="2" strokeDasharray={dropZoneActive ? '3 5' : '8 4'}
             style={{ transition: 'fill 0.3s, stroke 0.3s' }} />
         );
       })}
@@ -862,6 +862,10 @@ function HLogPDiagram({ points = [], lines = [], componentLabels = {}, highlight
           <g key={pt.id} onClick={e => { e.stopPropagation(); onPointClick?.(pt.id); }} style={{ cursor: interactive ? 'pointer' : 'default', touchAction: interactive ? 'none' : 'auto' }}>
             {/* Invisible enlarged hit target for touch */}
             {interactive && <circle cx={x} cy={y} r={26} fill="transparent" />}
+            {/* Valid target marker while a selection is active */}
+            {validTargets.includes(pt.id) && (
+              <circle cx={x} cy={y} r={20} fill="none" stroke="#30B5AE" strokeWidth="2" strokeDasharray="3 5" strokeLinecap="round" opacity="0.9" />
+            )}
             <circle cx={x} cy={y} r={isHl ? 16 : 12} fill="white" stroke={pt.color} strokeWidth={isHl ? 3 : 2}
               style={{ transition: 'r 0.2s, stroke-width 0.2s', animation: isHl ? 'pulse-glow 1s infinite' : 'none' }} />
             <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={pt.color} fontWeight="bold" fontFamily="Work Sans, sans-serif">{pt.id}</text>
@@ -1259,35 +1263,39 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
     }
   };
 
-  // Click to select, click bin to place
-  const handleCardClick = (cardId) => setSelectedCard(selectedCard === cardId ? null : cardId);
+  // Tik-tik: tap a card to select it, then tap a bin to place it
   const handleBinClick = (bin) => { if (selectedCard) tryPlace(selectedCard, bin); };
-  const handleBinCardClick = (cardId, fromBin) => {
-    setPlaced(prev => ({ ...prev, [fromBin]: prev[fromBin].filter(id => id !== cardId) }));
-    setSelectedCard(cardId);
-  };
 
-  // Drag support (pointer events)
+  // Pointer support: release without movement = tap (select), past threshold = drag.
+  // Tap selection is handled in pointerup (not onClick) because preventDefault on
+  // pointerdown suppresses the compatibility click event on touch devices.
+  const DRAG_THRESHOLD = 8;
   const handlePointerDown = (e, cardId) => {
     e.preventDefault();
-    setDragging({ id: cardId, x: e.clientX, y: e.clientY });
-    setSelectedCard(null);
+    setDragging({ id: cardId, x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY, moved: false });
   };
   const handlePointerMove = useCallback((e) => {
     if (!dragging) return;
-    setDragging(d => d ? { ...d, x: e.clientX, y: e.clientY } : null);
+    const moved = dragging.moved || Math.hypot(e.clientX - dragging.startX, e.clientY - dragging.startY) > DRAG_THRESHOLD;
+    if (moved && !dragging.moved) setSelectedCard(null);
+    setDragging({ ...dragging, x: e.clientX, y: e.clientY, moved });
   }, [dragging]);
   const handlePointerUp = useCallback((e) => {
     if (!dragging) return;
-    // Check which bin we're over
-    const checkBin = (ref, name) => {
-      if (!ref.current) return false;
-      const rect = ref.current.getBoundingClientRect();
-      return e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom ? name : false;
-    };
-    const bin = checkBin(binAbsRef, 'absoluut') || checkBin(binEffRef, 'effectief');
-    if (bin) {
-      tryPlace(dragging.id, bin);
+    if (dragging.moved) {
+      // Drop: check which bin we're over (same validation as tap via tryPlace)
+      const checkBin = (ref, name) => {
+        if (!ref.current) return false;
+        const rect = ref.current.getBoundingClientRect();
+        return e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom ? name : false;
+      };
+      const bin = checkBin(binAbsRef, 'absoluut') || checkBin(binEffRef, 'effectief');
+      if (bin) {
+        tryPlace(dragging.id, bin);
+      }
+    } else {
+      // Tap: toggle selection
+      setSelectedCard(prev => (prev === dragging.id ? null : dragging.id));
     }
     setDragging(null);
   }, [dragging]);
@@ -1305,7 +1313,7 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
   const renderBin = (type, label, icon, ref) => {
     const binCards = placed[type];
     const isFlash = flashBin === type;
-    const isOver = dragging && (() => {
+    const isOver = dragging && dragging.moved && (() => {
       if (!ref.current) return false;
       const r = ref.current.getBoundingClientRect();
       return dragging.x >= r.left && dragging.x <= r.right && dragging.y >= r.top && dragging.y <= r.bottom;
@@ -1314,8 +1322,8 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
       <div ref={ref} onClick={() => handleBinClick(type)}
         className="flex-1 min-h-48 rounded-xl p-4 transition-all cursor-pointer"
         style={{
-          border: isFlash ? '2px dashed #D92C2C' : isOver ? '2px dashed #1E8F6E' : selectedCard ? '2px dashed #0D4868' : '2px dashed #0D4868',
-          background: isFlash ? 'rgba(217,44,44,0.1)' : isOver ? 'rgba(30,143,110,0.1)' : selectedCard ? 'rgba(13,72,104,0.05)' : '#f8fbfc'
+          border: isFlash ? '2px dashed #D92C2C' : isOver ? '2px dashed #1E8F6E' : selectedCard ? '2px dashed #30B5AE' : '2px dashed #0D4868',
+          background: isFlash ? 'rgba(217,44,44,0.1)' : isOver ? 'rgba(30,143,110,0.1)' : selectedCard ? 'rgba(48,181,174,0.08)' : '#f8fbfc'
         }}>
         <div className="flex items-center gap-2 mb-3">
           {icon}
@@ -1326,8 +1334,8 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
             const card = M1R2_CARDS.find(c => c.id === id);
             return (
               <div key={id}
-                onClick={e => { e.stopPropagation(); handleBinCardClick(id, type); }}
-                onPointerDown={e => { e.stopPropagation(); handleBinCardClick(id, type); handlePointerDown(e, id); }}
+                onClick={e => e.stopPropagation()}
+                onPointerDown={e => { e.stopPropagation(); setPlaced(prev => ({ ...prev, [type]: prev[type].filter(x => x !== id) })); handlePointerDown(e, id); }}
                 className="px-3 py-2 rounded-lg text-xs cursor-grab active:cursor-grabbing flex items-center gap-1"
                 style={{ background: 'rgba(30,143,110,0.1)', border: '1px solid #1E8F6E', color: '#0D4868', touchAction: 'none' }}>
                 <Check size={12} style={{ color: '#1E8F6E' }} /> {card.text}
@@ -1348,22 +1356,21 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
         <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Sorteerspel</h3>
           <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Sorteer de kaartjes. Gaat het over <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>absolute druk</span> of over wat je op een <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>manometer</span> afleest?</p>
-          <p className="text-xs mb-4" style={{ color: '#5b7280' }}><span className="font-bold">Sleep</span> een kaartje naar de juiste bak, of <span className="font-bold">klik</span> en dan de bak.</p>
+          <p className="text-xs mb-4" style={{ color: '#5b7280' }}><span className="font-bold">Sleep</span> een kaartje naar de juiste bak, of <span className="font-bold">tik</span> eerst het kaartje en dan de bak aan.</p>
 
           {/* Unplaced cards */}
           <div className="flex flex-wrap gap-2 mb-4 min-h-12">
             {unplacedCards.map(card => (
               <div key={card.id}
-                onClick={() => handleCardClick(card.id)}
                 onPointerDown={e => handlePointerDown(e, card.id)}
                 className="px-3 py-2 rounded-lg text-sm transition-all cursor-grab active:cursor-grabbing select-none"
                 style={{
-                  border: selectedCard === card.id ? '2px solid #0D4868' : '2px solid #0D4868',
-                  background: selectedCard === card.id ? '#e6f4f5' : 'white',
+                  border: selectedCard === card.id ? '2px solid #30B5AE' : '2px solid #0D4868',
+                  background: selectedCard === card.id ? '#E7F4F3' : 'white',
                   color: '#0D4868',
-                  boxShadow: selectedCard === card.id ? '0 4px 12px rgba(0,0,0,0.12)' : 'none',
+                  boxShadow: selectedCard === card.id ? '0 0 0 2px rgba(48,181,174,0.35), 0 4px 12px rgba(0,0,0,0.12)' : 'none',
                   transform: selectedCard === card.id ? 'scale(1.05)' : 'scale(1)',
-                  opacity: dragging?.id === card.id ? 0.3 : 1,
+                  opacity: dragging?.id === card.id && dragging.moved ? 0.3 : 1,
                   touchAction: 'none',
                 }}>
                 {card.text}
@@ -1399,7 +1406,7 @@ function SortingGame({ onComplete, onLoseLife, lives }) {
       </div>
 
       {/* Drag ghost */}
-      {dragging && dragCard && (
+      {dragging?.moved && dragCard && (
         <div className="fixed pointer-events-none z-50 px-3 py-2 rounded-lg text-sm font-bold"
           style={{
             left: dragging.x, top: dragging.y, transform: 'translate(-50%, -50%)',
@@ -1618,7 +1625,8 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
       const dist = Math.sqrt((svgX - px) ** 2 + (svgY - py) ** 2);
       if (dist < minDist) { minDist = dist; closest = line; }
     });
-    return minDist < 40 ? closest : null;
+    // Ruime hit-zone rond de lijnen (zelfde validatie voor tik en sleep)
+    return minDist < 60 ? closest : null;
   };
 
   const tryPlaceComponent = (compId, clientX, clientY) => {
@@ -1653,19 +1661,28 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
     tryPlaceComponent(selectedComp, e.clientX, e.clientY);
   };
 
-  // Drag support
+  // Pointer support: release without movement = tap (select), past threshold = drag.
+  // Tap selection is handled in pointerup (not onClick) because preventDefault on
+  // pointerdown suppresses the compatibility click event on touch devices.
+  const DRAG_THRESHOLD = 8;
   const handlePointerDown = (e, compId) => {
     e.preventDefault();
-    setDragging({ id: compId, x: e.clientX, y: e.clientY });
-    setSelectedComp(null);
+    setDragging({ id: compId, x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY, moved: false });
   };
   const handlePointerMove = useCallback((e) => {
     if (!dragging) return;
-    setDragging(d => d ? { ...d, x: e.clientX, y: e.clientY } : null);
+    const moved = dragging.moved || Math.hypot(e.clientX - dragging.startX, e.clientY - dragging.startY) > DRAG_THRESHOLD;
+    if (moved && !dragging.moved) setSelectedComp(null);
+    setDragging({ ...dragging, x: e.clientX, y: e.clientY, moved });
   }, [dragging]);
   const handlePointerUp = useCallback((e) => {
     if (!dragging) return;
-    tryPlaceComponent(dragging.id, e.clientX, e.clientY);
+    if (dragging.moved) {
+      tryPlaceComponent(dragging.id, e.clientX, e.clientY);
+    } else {
+      // Tap: toggle selection, then tap a line in the diagram to place
+      setSelectedComp(prev => (prev === dragging.id ? null : dragging.id));
+    }
     setDragging(null);
   }, [dragging]);
 
@@ -1686,7 +1703,7 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
       <div className="max-w-3xl mx-auto" style={{ animation: 'fadeInUp 0.4s ease-out' }}>
         <div className="bg-white rounded-2xl p-6" style={{ border: '2px solid #0D4868', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}>
           <h3 className="text-lg font-extrabold mb-1" style={{ color: '#0D4868' }}>Componenten plaatsen</h3>
-          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Hier zie je het <span className="font-bold">bootje</span> in het h-log p diagram. Elke <span className="font-bold">lijn</span> is een onderdeel van het koelsysteem. <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Sleep een component naar de juiste lijn!</span></p>
+          <p className="text-sm italic mb-4" style={{ color: '#5b7280' }}>Hier zie je het <span className="font-bold">bootje</span> in het h-log p diagram. Elke <span className="font-bold">lijn</span> is een onderdeel van het koelsysteem. <span className="inline-block px-2 py-0.5 font-bold rounded" style={{ background: '#99D3D8', color: '#0D4868' }}>Sleep een component naar de juiste lijn</span> of tik eerst het component aan en daarna de juiste lijn.</p>
 
           <div className="overflow-x-auto mb-4">
             <div ref={svgRef} onClick={handleSvgClick} className="cursor-pointer min-w-[560px] sm:min-w-0">
@@ -1695,6 +1712,7 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
                 lines={BOOTJE_LINES}
                 componentLabels={placedComponents}
                 showDropZones={!allPlaced}
+                dropZoneActive={!!selectedComp}
                 highlightLine={flashLine}
                 dropZoneHighlight={flashLine ? '#ef4444' : undefined}
               />
@@ -1709,11 +1727,10 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
               const isDragging = dragging?.id === comp.id;
               return (
                 <div key={comp.id}
-                  onClick={() => !isPlaced && setSelectedComp(isSelected ? null : comp.id)}
                   onPointerDown={e => !isPlaced && handlePointerDown(e, comp.id)}
                   className="flex flex-col items-center gap-2 transition-all select-none"
                   style={{
-                    opacity: isPlaced ? 0.5 : isDragging ? 0.3 : 1,
+                    opacity: isPlaced ? 0.5 : (isDragging && dragging.moved) ? 0.3 : 1,
                     cursor: isPlaced ? 'default' : 'grab',
                     transform: isSelected ? 'scale(1.08)' : 'scale(1)',
                     touchAction: 'none',
@@ -1722,8 +1739,8 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
                   <div className="w-16 h-16 rounded-full flex items-center justify-center transition-all"
                     style={{
                       background: isPlaced ? '#1E8F6E' : isSelected ? comp.color : '#0D4868',
-                      border: isSelected ? `3px solid ${comp.color}` : '3px solid #0D4868',
-                      boxShadow: isSelected ? `0 0 0 3px ${comp.color}40, 0 4px 12px rgba(0,0,0,0.2)` : '0 2px 8px rgba(0,0,0,0.15)',
+                      border: isSelected ? '3px solid #30B5AE' : '3px solid #0D4868',
+                      boxShadow: isSelected ? '0 0 0 3px rgba(48,181,174,0.35), 0 4px 12px rgba(0,0,0,0.2)' : '0 2px 8px rgba(0,0,0,0.15)',
                     }}>
                     {isPlaced ? <Check size={28} color="white" /> : <ComponentIcon type={comp.id} size={28} className="text-white" />}
                   </div>
@@ -1761,7 +1778,7 @@ function ComponentPlacer({ onComplete, onLoseLife, lives }) {
       </div>
 
       {/* Drag ghost */}
-      {dragging && dragComp && (
+      {dragging?.moved && dragComp && (
         <div className="fixed pointer-events-none z-50 flex flex-col items-center gap-1"
           style={{ left: dragging.x, top: dragging.y, transform: 'translate(-50%, -50%)' }}>
           <div className="w-16 h-16 rounded-full flex items-center justify-center"
@@ -2153,30 +2170,24 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
     }
   };
 
-  // Click to select points
-  const handlePointClick = (pointId) => {
-    if (animating || allDone) return;
-    if (selectedFrom === null) {
-      setSelectedFrom(pointId);
-    } else {
-      tryConnect(selectedFrom, pointId);
-    }
-  };
-
-  // Drag to draw line
+  // Pointer support: release on the same point without movement = tap (select or
+  // connect with earlier selected point), movement = drag to draw a line.
+  // Taps are handled in pointerup (not onClick) because preventDefault on
+  // pointerdown suppresses the compatibility click event on touch devices.
+  const DRAG_THRESHOLD = 10;
   const handlePointerDown = useCallback((e) => {
     if (animating || allDone) return;
     const ptId = getPointNear(e.clientX, e.clientY);
     if (ptId) {
       e.preventDefault();
-      setDrawing({ fromId: ptId, mouseX: e.clientX, mouseY: e.clientY });
-      setSelectedFrom(null);
+      setDrawing({ fromId: ptId, mouseX: e.clientX, mouseY: e.clientY, startX: e.clientX, startY: e.clientY, moved: false });
     }
   }, [animating, allDone]);
 
   const handlePointerMove = useCallback((e) => {
     if (!drawing) return;
-    setDrawing(d => d ? { ...d, mouseX: e.clientX, mouseY: e.clientY } : null);
+    const moved = drawing.moved || Math.hypot(e.clientX - drawing.startX, e.clientY - drawing.startY) > DRAG_THRESHOLD;
+    setDrawing({ ...drawing, mouseX: e.clientX, mouseY: e.clientY, moved });
   }, [drawing]);
 
   const handlePointerUp = useCallback((e) => {
@@ -2184,9 +2195,18 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
     const toId = getPointNear(e.clientX, e.clientY);
     if (toId && toId !== drawing.fromId) {
       tryConnect(drawing.fromId, toId);
+    } else if (!drawing.moved && toId === drawing.fromId) {
+      // Tap on a point (same validation as drag via tryConnect)
+      if (selectedFrom === null) {
+        setSelectedFrom(drawing.fromId);
+      } else if (selectedFrom === drawing.fromId) {
+        setSelectedFrom(null);
+      } else {
+        tryConnect(selectedFrom, drawing.fromId);
+      }
     }
     setDrawing(null);
-  }, [drawing, phase]);
+  }, [drawing, selectedFrom, phase]);
 
   useEffect(() => {
     if (!drawing) return;
@@ -2238,7 +2258,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
 
   // Drawing preview line coords
   let drawLineCoords = null;
-  if (drawing) {
+  if (drawing && drawing.moved) {
     const fromPt = BOOTJE_POINTS.find(p => p.id === drawing.fromId);
     const svg = svgRef.current?.querySelector('svg') || svgRef.current;
     if (fromPt && svg) {
@@ -2263,7 +2283,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
           {!allDone && (
             <div className="p-3 rounded-lg text-sm mb-4" style={{ background: 'rgba(48,181,174,0.08)', border: '1px solid #30B5AE', color: '#0D4868', animation: 'fadeInUp 0.3s' }}>
               <p>{phase?.description}</p>
-              {!animating && <p className="mt-2 text-xs" style={{ color: '#5b7280' }}><span className="font-bold">Trek een lijn</span> tussen de twee punten, of klik ze aan.</p>}
+              {!animating && <p className="mt-2 text-xs" style={{ color: '#5b7280' }}><span className="font-bold">Trek een lijn</span> tussen de twee punten, of tik eerst het ene punt en dan het andere aan.</p>}
             </div>
           )}
 
@@ -2274,7 +2294,7 @@ function LineConnector({ onComplete, onLoseLife, lives }) {
               lines={visibleLines}
               componentLabels={connectedLines.reduce((acc, cl) => { acc[cl.component] = true; return acc; }, {})}
               highlightPoint={selectedFrom || drawing?.fromId}
-              onPointClick={handlePointClick}
+              validTargets={selectedFrom ? BOOTJE_POINTS.filter(p => p.id !== selectedFrom).map(p => p.id) : []}
               interactive={!animating && !allDone}
             >
               {/* Drawing preview line */}
